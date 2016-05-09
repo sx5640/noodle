@@ -1,2 +1,19 @@
-<h1>Articles#index</h1>
-<p>Find me in app/views/articles/index.html.erb</p>
+<%= form_tag articles_search_path, method: :get, class: "search-form" do %>
+  <%= text_field_tag(
+      :search,
+      params[:search],
+      placeholder: "Search",
+      class: "form-control"
+  ) %>
+  <%= datetime_select(
+  :start_time,
+  params[:start_time],
+  class: "form-control"
+  ) %>
+  <%= datetime_select(
+  :end_time,
+  params[:end_time],
+  class: "form-control"
+  ) %>
+  <%= submit_tag("search") %>
+<% end %>
