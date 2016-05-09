@@ -27,15 +27,16 @@ class ArticlesController < ApplicationController
                           permit_params[:end_time]["(3i)"].to_i,
                           permit_params[:end_time]["(4i)"].to_i,
                           permit_params[:end_time]["(5i)"].to_i)
-    end
-    if permit_params[:start_time] && permit_params[:end_time]
-      Article.joins(:keywords).where("articles.publication_time >= ? AND articles.publication_time <= ? and keywords.name = ?", permit_params[:start_time], permit_params[:end_time], permit_params[:search]).order(:publication_time)
+      result = Article.joins(:keywords).where("articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name = ?", permit_params[:start_time], permit_params[:end_time], permit_params[:search]).order(:publication_time)
+      result += Article.where("publication_time >= ? AND publication_time <= ? AND title LIKE ?", permit_params[:start_time], permit_params[:end_time], "%#{permit_params[:search]}%").order(:publication_time)
+
     else
-      Article.joins(:keywords).where("keywords.name = ?", permit_params[:search]).order(:publication_time)
+      result = Article.joins(:keywords).where("keywords.name = ?", permit_params[:search]).order(:publication_time)
+      result += Article.where("title LIKE ?", "%#{permit_params[:search]}%").order(:publication_time)
     end
   end
 
-  def article_density(articles, start_time, end_time)
+  def zoner(articles, start_time, end_time)
     timeline = []
   end
 end
