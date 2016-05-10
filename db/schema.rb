@@ -11,19 +11,35 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160508195957) do
+ActiveRecord::Schema.define(version: 20160510021830) do
 
   create_table "articles", force: :cascade do |t|
     t.string   "title"
     t.datetime "publication_time"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+    t.string   "author"
+    t.string   "snippet"
+    t.string   "lead_paragraph"
+    t.string   "abstract"
+    t.string   "source"
+    t.string   "web_url"
+    t.string   "media_url"
+    t.string   "document_type"
+    t.string   "news_desk"
+    t.string   "section"
+    t.string   "sub_section"
+    t.string   "type_of_material"
+    t.integer  "word_count"
+  end
+
+  create_table "articles_keywords", id: false, force: :cascade do |t|
+    t.integer "article_id", null: false
+    t.integer "keyword_id", null: false
   end
 
   create_table "keywords", force: :cascade do |t|
     t.string   "name"
-    t.integer  "article_id"
-    t.integer  "relevance"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

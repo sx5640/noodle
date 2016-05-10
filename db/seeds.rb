@@ -6,10 +6,32 @@
 #   cities = City.create([{ name: 'Chicago' }, { name: 'Copenhagen' }])
 #   Mayor.create(name: 'Emanuel', city: cities.first)
 
-article1 = Article.create(title: 'abc', publication_time: Time.now)
-article1 = Article.create(title: 'def', publication_time: Time.now)
+for i in (0 .. 100)
+  response = Article.get_articles('Elon Musk', i, 20130101, 20170101)
+  puts(i)
 
-keyword1 = Keyword.create(name: "first", article_id: 1, relevance: 1)
-keyword2 = Keyword.create(name: "second", article_id: 1, relevance: 2)
-keyword3 = Keyword.create(name: "first", article_id: 2, relevance: 1)
-keyword4 = Keyword.create(name: "third", article_id: 2, relevance: 2)
+  if response["response"]["docs"].empty?
+    break
+  else
+    response["response"]["docs"].each do |entry|
+      data = entry.select {|k,v| Article.new.attributes.keys.include?(k)}
+      article = Article.new(data)
+      article[:title] = entry['headline']['main']
+      if entry['byline'] && !entry['byline'].empty?
+        article[:author] = entry['byline']['original']
+      end
+      article[:media_url] = entry['multimedia'].first['url'] unless entry['multimedia'].empty?
+      article[:publication_time] = entry['pub_date'].to_datetime
+      article.save
+
+      entry['keywords'].each do |keyword|
+        if Keyword.find_by(name: keyword['value'])
+          article.keywords << Keyword.find_by(name: keyword['value'])
+        else
+          article.keywords.create(name: keyword['value'])
+        end
+      end
+    end
+  end
+
+end
