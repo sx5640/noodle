@@ -5,6 +5,9 @@
       placeholder: "Search",
       class: "form-control"
   ) %>
+  <br>
+  <%= submit_tag("search") %>
+  <br>
   <%= datetime_select(
   :start_time,
   params[:start_time],
@@ -15,5 +18,4 @@
   params[:end_time],
   class: "form-control"
   ) %>
-  <%= submit_tag("search") %>
 <% end %>

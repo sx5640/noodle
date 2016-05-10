@@ -1,1 +1,126 @@
-// Base styles for entire application
+/*
+  == BASE STYLES ==
+
+  Applying a few base style rules to make the page look a little nicer.
+*/
+
+body {
+  font-family: 'Fira Sans', Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+p {
+  margin: 0 0 16px;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+section {
+  margin-bottom: 32px;
+}
+
+section h2 {
+  margin: 0 0 12px;
+}
+
+
+
+/*
+  == STYLING THE NAV ==
+
+  Intro to floats. Moving the title to the left and the list items to the right.
+*/
+
+.nav-bar {
+  background-color: white;
+  color: black;
+  overflow: hidden;
+  height: 60px;
+  padding: 0 30px;
+}
+
+.title {
+  margin: 0;
+  float: left;
+  line-height: 60px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+
+.nav-list {
+  float: right;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-item {
+  list-style-type: none;
+  display: inline;
+  line-height: 60px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+
+/*
+  == STYLING THE LAYOUT ==
+
+  Creating a basic layout:
+    - Header on the top, spanning all the way across the page
+    - Aside on the left side, taking up 35% width
+    - Main on the right side, taking up 65% width
+    - Footer on the bottom, spanning all the way across the page
+*/
+
+main {
+  width: 100%;
+  float: left;
+  height: 100%;
+  padding: 30px;
+}
+
+.container {
+  overflow: hidden;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+}
+
+html {
+  height: 100%;
+}
+
+#search-section {
+  margin: 0 auto;
+}
+
+#search {
+  font-size: 3rem;
+  font-weight: 100;
+  color: #00c8ff;
+  border-width: 0;
+  border-bottom-width: 2px;
+  border-bottom-color: #ccc;
+}
+
+::-webkit-input-placeholder {
+  font-size: 3rem;
+  font-weight: 100;
+  color: #ccc;
+  text-align: center;
+}
+
+
+/*
+  == STYLING THE FOOTER ==
+
+  Similar to the navbar, we want to pull some elements to the left side and
+  some other elements to the right.
+*/
