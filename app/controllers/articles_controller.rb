@@ -8,6 +8,11 @@ class ArticlesController < ApplicationController
       start_time = @articles.first.publication_time
       end_time = @articles.last.publication_time
     end
+
+    respond_to do |format|
+      format.html
+      format.json { render json: @articles.to_json }
+    end
   end
 
   private
