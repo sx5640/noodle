@@ -25,10 +25,19 @@ for i in (0 .. 100)
       article.save
 
       entry['keywords'].each do |keyword|
-        if Keyword.find_by(name: keyword['value'])
-          article.keywords << Keyword.find_by(name: keyword['value'])
+        keyword_temp = keyword['value'].split(' (')
+        keyword['value'] = keyword_temp[0]
+        if keyword['name'] == 'persons'
+          name_temp = keyword['value'].split(', ')
+          if name_temp[1]
+            keyword['value'] = name_temp[1] + ' ' + name_temp[0]
+          end
+        end
+        finding = Keyword.find_by(name: keyword['value'], keyword_type: keyword['name'])
+        if finding
+          article.keywords << finding
         else
-          article.keywords.create(name: keyword['value'])
+          article.keywords.create(name: keyword['value'], keyword_type: keyword['name'])
         end
       end
     end
