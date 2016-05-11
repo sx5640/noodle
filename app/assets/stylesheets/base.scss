@@ -84,12 +84,19 @@ main {
 }
 
 .container {
-  @include outer-container;
+  // @include outer-container;
   // overflow: hidden;
+}
+
+.container {
+  @include outer-container;
+  overflow: hidden;
+  max-width: 1152px;
 }
 
 #search-section {
   margin: 0 auto;
+  max-width: 768px;
 }
 
 #search {
@@ -99,6 +106,14 @@ main {
   border-width: 0;
   border-bottom-width: 2px;
   border-bottom-color: #ccc;
+
+  &:hover {
+    border-bottom-color: #00c8ff;
+  }
+
+  &:focus {
+    border-bottom-color: #00c8ff;
+  }
 }
 
 ::-webkit-input-placeholder {
@@ -137,7 +152,7 @@ main {
   overflow: hidden;
 
   .keywords {
-    @include span-columns(6);
+    @include span-columns(4);
     text-align: right;
     padding-right: 64px;
     font-size: 1.333333rem;
@@ -145,7 +160,7 @@ main {
     color: #00c8ff;
   }
   .article-summary {
-    @include span-columns(5);
+    @include span-columns(6);
     // overflow: hidden;
     padding-bottom: 60px;
 

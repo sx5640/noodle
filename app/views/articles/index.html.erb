@@ -1,33 +1,31 @@
-<div class="container">
-  <main>
-    <div id="search-section">
-      <%= form_tag articles_search_path, method: :get, class: "search-form" do %>
-        <%= text_field_tag(
-            :search,
-            params[:search],
-            placeholder: "Search",
-            class: "form-control"
-        ) %>
-        <br>
-        <%= submit_tag("search", :id => "search") %>
-        <br>
-        <%= datetime_select(
-        :start_time,
-        params[:start_time],
-        class: "form-control"
-        ) %>
-        <%= datetime_select(
-        :end_time,
-        params[:end_time],
-        class: "form-control"
-        ) %>
-      <% end %>
-    </div>
+<main>
+  <div id="search-section">
+    <%= form_tag articles_search_path, method: :get, class: "search-form" do %>
+      <%= text_field_tag(
+          :search,
+          params[:search],
+          placeholder: "Search",
+          class: "form-control"
+      ) %>
+      <br>
+      <!-- <%#= submit_tag("search", :id => "search-submit") %>
+      <br>
+      <%#= datetime_select(
+      #:start_time,
+      #params[:start_time],
+      #class: "form-control"
+      #) %>
+      <%#= datetime_select(
+      #:end_time,
+      #params[:end_time],
+      #class: "form-control"
+      #) %> -->
+    <% end %>
+  </div>
 
-    <ul id="zone-list">
-    </ul>
-  </main>
-</div>
+  <ul id="zone-list">
+  </ul>
+</main>
 
 <script id="template-visualization" type="text/x-handlebars-template">
 	<li class="visualization-container">

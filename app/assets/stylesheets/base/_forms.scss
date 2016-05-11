@@ -29,8 +29,8 @@ textarea {
 select[multiple] {
   background-color: $base-background-color;
   border: $base-border;
-  border-radius: $base-border-radius;
-  box-shadow: $form-box-shadow;
+  // border-radius: $base-border-radius;
+  // box-shadow: $form-box-shadow;
   box-sizing: border-box;
   margin-bottom: $small-spacing;
   padding: $base-spacing / 3;
@@ -43,7 +43,7 @@ select[multiple] {
 
   &:focus {
     border-color: $action-color;
-    box-shadow: $form-box-shadow-focus;
+    // box-shadow: $form-box-shadow-focus;
     outline: none;
   }
 

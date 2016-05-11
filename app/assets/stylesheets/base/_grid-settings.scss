@@ -1,0 +1,19 @@
+@import "neat-helpers"; // or "neat-helpers" when in Rails
+
+// Adding a Visual Grid while you develop. Set to 'true.'
+$visual-grid: true;
+$visual-grid-color: #ccc;
+$visual-grid-index: front;
+$visual-grid-opacity: 0.2;
+
+// Change the grid settings
+$column: 60px;
+$gutter: 30px;
+$grid-columns: 12;
+$max-width: em(720);
+
+// Define your breakpoints
+// $mobile: new-breakpoint(min-width 480px 4);
+// $tablet: new-breakpoint(min-width 768px 8);
+
+$desktop: new-breakpoint(min-width 720px 12);
