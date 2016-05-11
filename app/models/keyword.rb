@@ -1,3 +1,4 @@
 class Keyword < ActiveRecord::Base
-  has_and_belongs_to_many :articles
+  has_many :keyword_analyses
+  has_many :articles, through: :keyword_analyses
 end

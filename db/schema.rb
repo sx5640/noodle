@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160510153445) do
+ActiveRecord::Schema.define(version: 20160511223223) do
 
   create_table "articles", force: :cascade do |t|
     t.string   "title"
@@ -33,9 +33,12 @@ ActiveRecord::Schema.define(version: 20160510153445) do
     t.integer  "word_count"
   end
 
-  create_table "articles_keywords", id: false, force: :cascade do |t|
-    t.integer "article_id", null: false
-    t.integer "keyword_id", null: false
+  create_table "keyword_analyses", force: :cascade do |t|
+    t.integer  "article_id"
+    t.integer  "keyword_id"
+    t.float    "relevance"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "keywords", force: :cascade do |t|
