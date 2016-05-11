@@ -84,6 +84,7 @@ main {
 }
 
 .container {
+  @include outer-container;
   overflow: hidden;
 }
 
@@ -107,14 +108,27 @@ main {
   text-align: center;
 }
 
-.article-summary-title {
-  font-family: "Roboto Slab";
-  font-size: 1.5rem;
-  font-weight: 300;
-}
+.zone-container {
+  .keywords {
+    @include span-columns(6);
+    text-align: right;
+    padding-right: 64px;
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: #00c8ff;
+  }
+  .article-summary {
+    @include span-columns(4);
+    .article-summary-title {
+      font-family: "Roboto Slab";
+      font-size: 1.5rem;
+      font-weight: 400;
+    }
 
-.article-summary-body {
-  font-weight: 300;
+    .article-summary-body {
+      font-weight: 300;
+    }
+  }
 }
 
 /*
