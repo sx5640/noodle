@@ -19,16 +19,36 @@ $(document).on('ready', function() {
         if (data) {
 
           // First clear the article summary list
-          $('.article-summary-list').empty();
+          $('#zone-list').empty();
 
           // Compile the template with source HTML
-          var source = $('#article-summary-list-item').html();
-          var template = Handlebars.compile(source);
+          var sourceVisualization = $('#template-visualization').html();
+          var templateVisualization = Handlebars.compile(sourceVisualization);
 
-          // Loop through each article and combine it with the template
+          var sourceZone = $('#template-zone').html();
+          var templateZone = Handlebars.compile(sourceZone);
+
+          // Loop through each zone and combine it with the templates
           for ( var i = 0; i < data.length; i++ ) {
-            var html = template(data[i]);
-            $('.article-summary-list').append(html);
+            console.log(data[i]);
+
+            var zone = data[i];
+            if (zone !== null && zone.count > 0) {
+              var htmlVisualization = templateVisualization(zone);
+              var size = 50 + zone.hottness * 25;
+              var visualizationDiv;
+
+              $('#zone-list').append(htmlVisualization);
+              visualizationDiv = $('.visualization').last();
+
+              visualizationDiv.css('width', size + 'px');
+              visualizationDiv.css('height', size + 'px');
+              visualizationDiv.css('opacity', .5 + zone.hottness/10/2);
+              visualizationDiv.css('font-size', 1 + zone.hottness/2 + 'rem');
+
+              var htmlZone = templateZone(zone.article_list[0]);
+              $('#zone-list').append(htmlZone);
+            }
           }
         }
       }

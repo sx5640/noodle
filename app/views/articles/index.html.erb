@@ -24,20 +24,32 @@
       <% end %>
     </div>
 
-    <ul class="article-summary-list">
+    <ul id="zone-list">
     </ul>
   </main>
 </div>
 
-<script id="article-summary-list-item" type="text/x-handlebars-template">
-	<li class="zone-container">
-    <div class="keywords">
-      Lorem Ipsum Dolor
+<script id="template-visualization" type="text/x-handlebars-template">
+	<li class="visualization-container">
+    <div class="visualization">
+      <div class="hotness">
+        {{hottness}}
+      </div>
     </div>
+  </li>
+</script>
+
+<script id="template-zone" type="text/x-handlebars-template">
+	<li class="zone">
+    <ul class="keywords">
+      <li>SpaceX</li>
+      <li>Hyperloop</li>
+      <li>Nasa</li>
+    </ul>
     <div class="article-summary">
       <h2 class="article-summary-title">{{title}}</h2>
       <p class="article-summary-body">{{lead_paragraph}}</p>
-  		<a href="{{web_url}}">MORE</a>
+  		<a class="article-web-url" href="{{web_url}}">More</a>
     </div>
 	</li>
 </script>

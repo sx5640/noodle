@@ -85,7 +85,7 @@ main {
 
 .container {
   @include outer-container;
-  overflow: hidden;
+  // overflow: hidden;
 }
 
 #search-section {
@@ -108,25 +108,62 @@ main {
   text-align: center;
 }
 
-.zone-container {
+.visualization-container {
+  width: 100%;
+  padding: 40px;
+}
+
+.visualization {
+  position: relative;
+  margin: 0 auto;
+  background-color: #00c8ff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  color: white;
+}
+
+.hotness {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 100;
+}
+
+.zone {
+
+  overflow: hidden;
+
   .keywords {
     @include span-columns(6);
     text-align: right;
     padding-right: 64px;
-    font-size: 1.5rem;
+    font-size: 1.333333rem;
     font-weight: 400;
     color: #00c8ff;
   }
   .article-summary {
-    @include span-columns(4);
+    @include span-columns(5);
+    // overflow: hidden;
+    padding-bottom: 60px;
+
     .article-summary-title {
       font-family: "Roboto Slab";
-      font-size: 1.5rem;
+      font-size: 1.777777777rem;
       font-weight: 400;
     }
 
     .article-summary-body {
       font-weight: 300;
+    }
+
+    .article-web-url {
+      font-size: .75rem;
+      text-transform: uppercase;
+      // float: right;
+      color: #00c8ff;
     }
   }
 }
