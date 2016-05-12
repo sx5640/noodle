@@ -142,14 +142,14 @@ class ArticlesController < ApplicationController
     coldest = temp[1]
     total = temp[2]
     average = total/20.0
-    #calculate hottness based on the count of articles in the zone, comparing to average, max, min
+    #calculate hotness based on the count of articles in the zone, comparing to average, max, min
     zones.each do |zone|
       if zone[:count] > average
-        zone[:hottness] = (5 + (zone[:count] - average) * 5 / (hottest - average)).round
+        zone[:hotness] = (5 + (zone[:count] - average) * 5 / (hottest - average)).round
       elsif zone[:count] < average
-        zone[:hottness] = 5 - ((average - zone[:count]) * 5 / (average - coldest)).round
+        zone[:hotness] = 5 - ((average - zone[:count]) * 5 / (average - coldest)).round
       elsif zone[:count] = average
-        zone[:hottness] = 5
+        zone[:hotness] = 5
       end
     end
     return zones
@@ -163,10 +163,10 @@ class ArticlesController < ApplicationController
         # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
         corresponding_keyword_analysis = KeywordAnalysis.where("article_id = ? AND keyword_id = ?", article, keyword)
         unless corresponding_keyword_analysis.empty?
-          if keywords_collection.keys.include?(keyword)
-            keywords_collection["#{keyword}"] += corresponding_keyword_analysis.first.relevance
+          if keywords_collection.keys.include?(keyword.name)
+            keywords_collection["#{keyword.name}"] += corresponding_keyword_analysis.first.relevance
           else
-            keywords_collection["#{keyword}"] = corresponding_keyword_analysis.first.relevance
+            keywords_collection["#{keyword.name}"] = corresponding_keyword_analysis.first.relevance
           end
         end
       end
@@ -174,7 +174,7 @@ class ArticlesController < ApplicationController
     # rank the keyword and output in arry
     ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
     result = []
-    ranking_keyword.each do |keyword_relevance|
+    ranking_keyword.reverse!.each do |keyword_relevance|
       result << {keyword: keyword_relevance[0].to_s, relevance: keyword_relevance[1]}
     end
     return result

@@ -35,14 +35,14 @@ $(document).on('ready', function() {
           var templateZone = Handlebars.compile(sourceZone);
 
           // Loop through each zone and combine it with the templates
-          for ( var i = 0; i < data.length; i++ ) {
-            console.log(data[i]);
+          for ( var i = 0; i < data['zones'].length; i++ ) {
+            console.log(data['zones'][i]);
 
-            var zone = data[i];
+            var zone = data['zones'][i];
             if (zone !== null) {
               if (zone.count > 0) {
                 var htmlVisualization = templateVisualization(zone);
-                var size = 25 + zone.hottness * 25;
+                var size = 25 + zone.hotness * 25;
                 var visualizationDiv;
                 var start_date = new Date(zone.start_time);
                 var end_date = new Date(zone.end_time);
@@ -63,8 +63,8 @@ $(document).on('ready', function() {
 
                 visualizationDiv.css('width', size + 'px');
                 visualizationDiv.css('height', size + 'px');
-                visualizationDiv.css('opacity', .5 + zone.hottness/10/2);
-                visualizationDiv.css('font-size', .75 + zone.hottness/4 + 'rem');
+                visualizationDiv.css('opacity', .5 + zone.hotness/10/2);
+                visualizationDiv.css('font-size', .75 + zone.hotness/4 + 'rem');
 
                 // Display year
 
@@ -103,7 +103,7 @@ $(document).on('ready', function() {
 
                   // Retrieve data for zone corresponding to click event
                   var ind = $(this).index();
-                  var zone = data[ind];
+                  var zone = data['zones'][ind];
 
                   // Remove zone-list from DOM temporarily
                   global_zoneList = $('#zone-list').detach();
