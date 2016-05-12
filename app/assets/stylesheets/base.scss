@@ -123,6 +123,28 @@ main {
   text-align: center;
 }
 
+.zone-connector {
+  background-color: #00c8ff;
+  margin: 0 auto;
+  width: 1px;
+  height: 100px;
+  margin-bottom: 40px;
+}
+
+.zone-month {
+  font-size: 1.333333rem;
+  font-weight: 200;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.zone-year {
+  font-size: 1rem;
+  font-weight: 400;
+  text-align: center;
+  margin: 0 auto;
+}
+
 .visualization-container {
   width: 100%;
   padding: 40px;
@@ -162,7 +184,7 @@ main {
   .article-summary {
     @include span-columns(6);
     // overflow: hidden;
-    padding-bottom: 60px;
+    padding-bottom: 40px;
 
     .article-summary-title {
       font-family: "Roboto Slab";

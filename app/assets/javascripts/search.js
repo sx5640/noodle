@@ -35,8 +35,35 @@ $(document).on('ready', function() {
             var zone = data[i];
             if (zone !== null && zone.count > 0) {
               var htmlVisualization = templateVisualization(zone);
-              var size = 50 + zone.hottness * 25;
+              var size = 25 + zone.hottness * 25;
               var visualizationDiv;
+              var start_date = new Date(zone.start_time);
+              var end_date = new Date(zone.end_time);
+              var months = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+              var start_month = months[start_date.getMonth()];
+              var end_month = months[end_date.getMonth()];
+              var dateDisplay = "";
+
+              // Display verticle zone connector line, except for the first zone
+              if (i !== 0) {
+                $('#zone-list').append("<div class='zone-connector'></div>");
+              }
+
+              // Display month range of zone, eg. JUNE - JULY
+
+              if (start_month === end_month) {
+                dateDisplay = start_month;
+              } else {
+                dateDisplay = start_month + " - " + end_month;
+              }
+              dateDisplay = dateDisplay.toUpperCase();
+              $('#zone-list').append("<div class='zone-month'>" + dateDisplay + "</div>");
+
+              // Display year
+
+              $('#zone-list').append("<div class='zone-year'>" + end_date.getFullYear() + "</div>");
+
+              // Display zone hotness visualization (circle)
 
               $('#zone-list').append(htmlVisualization);
               visualizationDiv = $('.visualization').last();
@@ -44,7 +71,9 @@ $(document).on('ready', function() {
               visualizationDiv.css('width', size + 'px');
               visualizationDiv.css('height', size + 'px');
               visualizationDiv.css('opacity', .5 + zone.hottness/10/2);
-              visualizationDiv.css('font-size', 1 + zone.hottness/2 + 'rem');
+              visualizationDiv.css('font-size', .75 + zone.hottness/4 + 'rem');
+
+              // Display zone summary, eg. keywords, representative article, etc.
 
               var htmlZone = templateZone(zone.article_list[0]);
               $('#zone-list').append(htmlZone);
