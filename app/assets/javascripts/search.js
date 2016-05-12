@@ -23,6 +23,10 @@ $(document).on('ready', function() {
           // First clear the article summary list
           $('#zone-list').empty();
 
+          // Display Keywords for entire timeline
+          var htmlKeywords = "<ul id='top-keywords-list'>SpaceX Tesla PayPal Elon Musk Renewable Energy Mars Electric Rocket Capsule Landing</ul>";
+          $('#keywords-container').append(htmlKeywords);
+
           // Compile the template with source HTML
           var sourceVisualization = $('#template-visualization').html();
           var templateVisualization = Handlebars.compile(sourceVisualization);
