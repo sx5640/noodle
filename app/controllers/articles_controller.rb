@@ -10,8 +10,9 @@ class ArticlesController < ApplicationController
     if @articles
       start_time = @articles.last.publication_time
       end_time = @articles.first.publication_time
-      @result = dividing_into_zones(@articles, start_time, end_time)
-      puts(@result.inject(0) {|sum, zone| sum + zone[:count]})
+      @result = {zones: dividing_into_zones(@articles, start_time, end_time)}
+      @result[:keywords] = getting_keyword(@articles)
+      puts(@result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
       # output the zones
       respond_to do |format|
         format.html
@@ -119,6 +120,7 @@ class ArticlesController < ApplicationController
       zones[i][:article_list] = articles.select { |article|
                   article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]}
       zones[i][:count] = zones[i][:article_list].size
+      zones[i][:keywords] = getting_keyword(zones[i][:article_list])
     end
     zones = calculating_hotness(zones)
     return zones
@@ -153,7 +155,28 @@ class ArticlesController < ApplicationController
     return zones
   end
   # defining a method that takes in a zone or a selection of articles and returns top keywords
-  # def getting_keyword(articles)
-  #   articles.
-  # end
+  def getting_keyword(articles)
+    # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
+    keywords_collection = {}
+    articles.each do |article|
+      article.keywords.each do |keyword|
+        # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
+        corresponding_keyword_analysis = KeywordAnalysis.where("article_id = ? AND keyword_id = ?", article, keyword)
+        unless corresponding_keyword_analysis.empty?
+          if keywords_collection.keys.include?(keyword)
+            keywords_collection["#{keyword}"] += corresponding_keyword_analysis.first.relevance
+          else
+            keywords_collection["#{keyword}"] = corresponding_keyword_analysis.first.relevance
+          end
+        end
+      end
+    end
+    # rank the keyword and output in arry
+    ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
+    result = []
+    ranking_keyword.each do |keyword_relevance|
+      result << {keyword: keyword_relevance[0].to_s, relevance: keyword_relevance[1]}
+    end
+    return result
+  end
 end
