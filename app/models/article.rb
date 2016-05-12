@@ -33,14 +33,16 @@ class Article < ActiveRecord::Base
             end
             existing_keyword = Keyword.find_by(name: keyword['value'], keyword_type: keyword['name'])
             if existing_keyword
-              new_keyword_analysis = article.keyword_analyses.create
+              new_keyword_analysis = article.keyword_analyses.new
               new_keyword_analysis.keyword = existing_keyword
               new_keyword_analysis[:relevance] = 0.5 + (0.5 / keyword['rank'].to_f)
+              new_keyword_analysis.save
             else
               new_keyword = Keyword.create(name: keyword['value'], keyword_type: keyword['name'])
-              new_keyword_analysis = article.keyword_analyses.create
+              new_keyword_analysis = article.keyword_analyses.new
               new_keyword_analysis.keyword = new_keyword
               new_keyword_analysis[:relevance] = 0.5 + (0.5 / keyword['rank'].to_f)
+              new_keyword_analysis.save
             end
           end
         end
