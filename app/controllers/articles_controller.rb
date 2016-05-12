@@ -50,8 +50,11 @@ class ArticlesController < ApplicationController
 
     zones = []
     for i in (0 .. 19)
-      zones[i] = {start_time: begin_date + time_unit * i, end_time: begin_date + time_unit * (i + 1)}
-      zones[i][:article_list] = articles.select { |article| article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]}
+      zones[i] = {
+                  start_time: begin_date + time_unit * i,
+                  end_time: begin_date + time_unit * (i + 1)}
+      zones[i][:article_list] = articles.select { |article|
+                  article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]}
       zones[i][:count] = zones[i][:article_list].size
     end
     zones = hotness(zones)
@@ -74,7 +77,7 @@ class ArticlesController < ApplicationController
     coldest = temp[1]
     total = temp[2]
     average = total/20.0
-
+    #calculate hottness based on the count of articles in the zone, comparing to average, max, min
     zones.each do |zone|
       if zone[:count] > average
         zone[:hottness] = (5 + (zone[:count] - average) * 5 / (hottest - average)).round
@@ -85,5 +88,9 @@ class ArticlesController < ApplicationController
       end
     end
     return zones
+  end
+
+  def method
+    #code
   end
 end
