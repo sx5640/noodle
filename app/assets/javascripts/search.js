@@ -20,12 +20,40 @@ $(document).on('ready', function() {
 
         if (data) {
 
+          console.log(data);
+
           // First clear the article summary list
           $('#zone-list').empty();
 
           // Display Keywords for entire timeline
-          var htmlKeywords = "<ul id='top-keywords-list'>SpaceX Tesla PayPal Elon Musk Renewable Energy Mars Electric Rocket Capsule Landing</ul>";
-          $('#keywords-container').append(htmlKeywords);
+          var htmlKeywords = "<div id='top-keywords-list'></div>";
+          $('#keywords-container').html(htmlKeywords);
+
+          if (data['keywords'] !== null) {
+            var keywordMax = data['keywords'].length < 10 ? data['keywords'].length : 10;
+
+            for (var i = 0; i < keywordMax; i++) {
+              var htmlKeyword = "<a href='/' class='top-keywords'>" + data['keywords'][i].keyword + "</a> ";
+              var fontWeight = '300';
+              if (data['keywords'][i].relevance > 10.0) {
+                fontWeight = '500';
+              } else
+              if (data['keywords'][i].relevance > 3.0) {
+                fontWeight = '400';
+              } else
+              if (data['keywords'][i].relevance > 2.0) {
+                fontWeight = '300';
+              } else
+              if (data['keywords'][i].relevance > 1.0) {
+                fontWeight = '200';
+              } else {
+                fontWeight = '100';
+              }
+              var appendObject = $(htmlKeyword);
+              appendObject.css('font-weight', fontWeight);
+              $('#top-keywords-list').append(appendObject);
+            }
+          }
 
           // Compile the template with source HTML
           var sourceVisualization = $('#template-visualization').html();
@@ -55,6 +83,38 @@ $(document).on('ready', function() {
 
                 var htmlZone = templateZone(zone.article_list[0]);
                 $('#zone-list').append(htmlZone);
+
+                // Append first 5 keywords
+
+                // console.log(zone.keywords.length);
+                // var keywordMax2 = zone.keywords.length < 5 ? zone.keywords.length : 5;
+                // console.log(keywordMax2);
+
+                if (zone.keywords !== null) {
+                  var keywordMax2 = zone.keywords.length < 5 ? zone.keywords.length : 5;
+
+                  if (keywordMax2 > 0) {
+                    for (var j = 0; j < keywordMax2; j++) {
+                      var htmlZoneKeyword = "<li>" + zone.keywords[j].keyword + "</li>";
+                      var appendObject2 = $(htmlZoneKeyword);
+
+                      var fontWeight2 = '200';
+                      if (zone.keywords[j].relevance > 3.0) {
+                        fontWeight2 = '500';
+                      } else
+                      if (zone.keywords[j].relevance > 1.0) {
+                        fontWeight2 = '400';
+                      } else
+                      if (zone.keywords[j].relevance > .5) {
+                        fontWeight2 = '300';
+                      }
+                      appendObject2.css('font-weight', fontWeight2);
+                      $('.keywords').last().append(appendObject2);
+                    }
+                  } else {
+                    $('.keywords').last().append("<li>No keywords</li>");
+                  }
+                }
 
                 // Display zone hotness visualization (circle)
 
