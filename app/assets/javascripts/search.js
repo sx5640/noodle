@@ -84,6 +84,38 @@ $(document).on('ready', function() {
                 var htmlZone = templateZone(zone.article_list[0]);
                 $('#zone-list').append(htmlZone);
 
+                // Append first 5 keywords
+
+                // console.log(zone.keywords.length);
+                // var keywordMax2 = zone.keywords.length < 5 ? zone.keywords.length : 5;
+                // console.log(keywordMax2);
+
+                if (zone.keywords !== null) {
+                  var keywordMax2 = zone.keywords.length < 5 ? zone.keywords.length : 5;
+
+                  if (keywordMax2 > 0) {
+                    for (var j = 0; j < keywordMax2; j++) {
+                      var htmlZoneKeyword = "<li>" + zone.keywords[j].keyword + "</li>";
+                      var appendObject2 = $(htmlZoneKeyword);
+
+                      var fontWeight2 = '200';
+                      if (zone.keywords[j].relevance > 3.0) {
+                        fontWeight2 = '500';
+                      } else
+                      if (zone.keywords[j].relevance > 1.0) {
+                        fontWeight2 = '400';
+                      } else
+                      if (zone.keywords[j].relevance > .5) {
+                        fontWeight2 = '300';
+                      }
+                      appendObject2.css('font-weight', fontWeight2);
+                      $('.keywords').last().append(appendObject2);
+                    }
+                  } else {
+                    $('.keywords').last().append("<li>No keywords</li>");
+                  }
+                }
+
                 // Display zone hotness visualization (circle)
 
                 $('.zone').last().prepend(htmlVisualization);
