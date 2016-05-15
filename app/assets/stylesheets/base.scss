@@ -116,6 +116,7 @@ main {
   }
 }
 
+// Styling for search input field placeholder text
 ::-webkit-input-placeholder {
   font-size: 3rem;
   font-weight: 100;
@@ -170,8 +171,14 @@ main {
 }
 
 #top-keywords-list {
+  word-spacing: -0.1rem;
   text-align: center;
   margin-bottom: 120px;
+
+  li {
+    display: inline;
+    margin: 0 10px;
+  }
 }
 
 .top-keywords {
@@ -188,9 +195,6 @@ main {
     @include span-columns(4);
     text-align: right;
     padding-right: 64px;
-    font-size: 1.333333rem;
-    font-weight: 400;
-    color: #00c8ff;
   }
   .article-summary {
     @include span-columns(6);
@@ -219,6 +223,12 @@ main {
       color: #00c8ff;
     }
   }
+}
+
+.top-keywords-zone {
+  font-size: 1.333333rem;
+  font-weight: 400;
+  color: #00c8ff;
 }
 
 /*
