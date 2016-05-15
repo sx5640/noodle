@@ -125,6 +125,7 @@ class ArticlesController < ApplicationController
     zones = calculating_hotness(zones)
     return zones
   end
+  
   # defining a function that can calculate "hottest" of a zone, based on the number of articles it has comparing to the average, and to the max and min
   def calculating_hotness(zones)
     # find the max, min, average
@@ -154,6 +155,7 @@ class ArticlesController < ApplicationController
     end
     return zones
   end
+
   # defining a method that takes in a zone or a selection of articles and returns top keywords
   def getting_keyword(articles)
     # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
