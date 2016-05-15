@@ -1,6 +1,7 @@
 $(document).on('ready', function() {
 
   var global_zoneList;
+  var global_articleList;
 
   // AJAX call to submit search terms and display the article results
   $('.search-form').on('submit', function(eventObject) {
@@ -80,14 +81,7 @@ $(document).on('ready', function() {
                 }
 
                 // Bind an eventhandler to each newly created zone to handle zooming
-                $('.zone').last().on('mouseover', function(eventObject) {
-                  $(this).css('color', '#00c8ff');
-                });
-
-                $('.zone').last().on('mouseout', function(eventObject) {
-                  $(this).css('color', '');
-                });
-
+                // When user clicks into a zone, display the articles view
                 $('.zone').last().on('click', function(eventObject) {
 
                   // Retrieve data for zone corresponding to click event
@@ -100,6 +94,10 @@ $(document).on('ready', function() {
                   // Append new DOM element article-list
                   var htmlArticleList = '<ul class="article-list"></ul>';
                   $('.content-container').append(htmlArticleList);
+
+                  // Add a 'back to timeline' link - the most basic timeline navigation
+                  var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+                  $('#timeline-nav').html(htmlBackToTimeline);
 
                   // Construct each article using the article-summary - reuse template-zone for now
                   for (var i = 0; i < zone.count; i++) {
@@ -125,5 +123,17 @@ $(document).on('ready', function() {
         }
       }
     });
+  });
+
+  // Add event handler to go back to timeline via AJAX
+  $('#timeline-nav').on('click', function(eventObject) {
+    eventObject.preventDefault();
+
+    // Detach article list and reattach timeline
+    global_articleList = $('article-list').detach();
+    $('.content-container').html(global_zoneList);
+
+    // Remove back link
+    $('#timeline-nav').empty();
   });
 });

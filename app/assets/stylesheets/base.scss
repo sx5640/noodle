@@ -119,6 +119,16 @@ main {
   }
 }
 
+#timeline-nav {
+  margin-bottom: 60px;
+  font-size: .735rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+#back-to-timeline {
+}
+
 // Styling for search input field placeholder text
 ::-webkit-input-placeholder {
   font-size: 2.37rem;
@@ -176,7 +186,7 @@ main {
 #top-keywords-list {
   word-spacing: -0.1rem;
   text-align: center;
-  margin-bottom: 120px;
+  margin-bottom: 60px;
 
   li {
     display: inline;
@@ -227,6 +237,10 @@ main {
       color: #00c8ff;
     }
   }
+}
+
+.zone:hover {
+  color: #00c8ff;
 }
 
 .top-keywords-zone {
