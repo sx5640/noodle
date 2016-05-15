@@ -37,7 +37,7 @@ $(document).on('ready', function() {
             if (zone !== null) {
               if (zone.count > 0) {
                 var htmlVisualization = templateVisualization(zone);
-                var size = 15 + zone.hotness * 20;
+                var size = 25 + zone.hotness * 25;
                 var visualizationDiv;
                 var start_date = new Date(zone.start_time);
                 var end_date = new Date(zone.end_time);
@@ -59,7 +59,7 @@ $(document).on('ready', function() {
 
                 visualizationDiv.css('width', size + 'px');
                 visualizationDiv.css('height', size + 'px');
-                visualizationDiv.css('opacity', 0 + zone.hotness * .1);
+                visualizationDiv.css('opacity', .35 + zone.hotness * .05);
                 visualizationDiv.css('font-size', .75 + zone.hotness/4 + 'rem');
 
                 // Display year
@@ -81,7 +81,7 @@ $(document).on('ready', function() {
 
                 // Bind an eventhandler to each newly created zone to handle zooming
                 $('.zone').last().on('mouseover', function(eventObject) {
-                  $(this).css('color', '#0096bf');
+                  $(this).css('color', '#00c8ff');
                 });
 
                 $('.zone').last().on('mouseout', function(eventObject) {

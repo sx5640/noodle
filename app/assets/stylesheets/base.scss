@@ -48,7 +48,8 @@ section h2 {
   float: left;
   line-height: 60px;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: .735rem;
+  font-weight: 500;
 }
 
 
@@ -63,7 +64,8 @@ section h2 {
   display: inline;
   line-height: 60px;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: .735rem;
+  font-weight: 500;
 }
 
 
@@ -100,12 +102,13 @@ main {
 }
 
 #search {
-  font-size: 3rem;
+  font-size: 2.37rem;
   font-weight: 100;
   color: #00c8ff;
   border-width: 0;
   border-bottom-width: 2px;
   border-bottom-color: #ccc;
+  margin: 0;
 
   &:hover {
     border-bottom-color: #00c8ff;
@@ -118,7 +121,7 @@ main {
 
 // Styling for search input field placeholder text
 ::-webkit-input-placeholder {
-  font-size: 3rem;
+  font-size: 2.37rem;
   font-weight: 100;
   color: #ccc;
   text-align: center;
@@ -133,14 +136,14 @@ main {
 }
 
 .zone-month {
-  font-size: 1.333333rem;
+  font-size: 1rem;
   font-weight: 200;
   text-align: center;
   margin: 0 auto;
 }
 
 .zone-year {
-  font-size: 1rem;
+  font-size: 0.75rem;
   font-weight: 400;
   text-align: center;
   margin: 0 auto;
@@ -182,7 +185,7 @@ main {
 }
 
 .top-keywords {
-  font-size: 1.777777rem;
+  font-size: 1.333333rem;
   font-weight: 400;
   color: #00c8ff;
 }
@@ -194,10 +197,11 @@ main {
   .keywords {
     @include span-columns(4);
     text-align: right;
-    padding-right: 64px;
+    padding-right: 32px;
   }
   .article-summary {
     @include span-columns(6);
+    cursor: pointer;
     // overflow: hidden;
     padding-bottom: 40px;
 
@@ -226,7 +230,7 @@ main {
 }
 
 .top-keywords-zone {
-  font-size: 1.333333rem;
+  font-size: 1rem;
   font-weight: 400;
   color: #00c8ff;
 }
@@ -243,5 +247,6 @@ footer {
   float: left;
   line-height: 60px;
   text-transform: uppercase;
-  font-size: 12px;
+  font-size: .735rem;
+  font-weight: 500;
 }
