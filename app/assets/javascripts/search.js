@@ -20,7 +20,7 @@ $(document).on('ready', function() {
           $('#zone-list').empty();
 
           // Display Keywords for entire timeline
-          replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
+          timeline.replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
 
           // Compile the template with source HTML
           var sourceVisualization = $('#template-visualization').html();
@@ -37,7 +37,7 @@ $(document).on('ready', function() {
             if (zone !== null) {
               if (zone.count > 0) {
                 var htmlVisualization = templateVisualization(zone);
-                var size = 25 + zone.hotness * 25;
+                var size = 15 + zone.hotness * 20;
                 var visualizationDiv;
                 var start_date = new Date(zone.start_time);
                 var end_date = new Date(zone.end_time);
@@ -51,7 +51,7 @@ $(document).on('ready', function() {
                 $('#zone-list').append(htmlZone);
 
                 // Append first 3 keywords
-                replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
+                timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
 
                 // Display zone hotness visualization (circle)
                 $('.zone').last().prepend(htmlVisualization);
@@ -59,7 +59,7 @@ $(document).on('ready', function() {
 
                 visualizationDiv.css('width', size + 'px');
                 visualizationDiv.css('height', size + 'px');
-                visualizationDiv.css('opacity', .5 + zone.hotness/10/2);
+                visualizationDiv.css('opacity', 0 + zone.hotness * .1);
                 visualizationDiv.css('font-size', .75 + zone.hotness/4 + 'rem');
 
                 // Display year
@@ -107,7 +107,7 @@ $(document).on('ready', function() {
                     $('.article-list').append(htmlArticle);
 
                     // Append first 3 keywords
-                    replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
+                    timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
                   }
 
                   // Show the top of the document instead of the bottom
