@@ -14,4 +14,5 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require handlebars-v4.0.5.js
-//= require_tree .
+//= require timeline.js
+//= require search.js
