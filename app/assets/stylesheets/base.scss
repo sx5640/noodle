@@ -204,11 +204,25 @@ main {
 
   overflow: hidden;
 
-  .keywords {
+  .aside {
     @include span-columns(4);
-    text-align: right;
-    padding-right: 32px;
+    padding-top: .67rem;
+
+    .keywords {
+      text-align: right;
+      padding-right: 32px;
+    }
+    .number-of-articles {
+      font-size: 1.333333rem;
+      font-weight: 200;
+      color: #00c8ff;
+      // color: #5f5f5f;
+      text-align: right;
+      padding-right: 32px;
+      padding-top: 1.777777rem;
+    }
   }
+
   .article-summary {
     @include span-columns(6);
     cursor: pointer;

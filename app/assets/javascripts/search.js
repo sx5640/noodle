@@ -54,6 +54,15 @@ $(document).on('ready', function() {
                 // Append first 3 keywords
                 timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
 
+                // Display number of articles
+                var htmlNumberOfArticles = zone.article_list.length;
+                if (zone.article_list.length === 0 || zone.article_list.length > 1) {
+                  htmlNumberOfArticles += ' stories';
+                } else {
+                  htmlNumberOfArticles += ' story';
+                }
+                $('.number-of-articles').last().html(htmlNumberOfArticles);
+
                 // Display zone hotness visualization (circle)
                 $('.zone').last().prepend(htmlVisualization);
                 visualizationDiv = $('.visualization').last();
