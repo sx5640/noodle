@@ -94,7 +94,7 @@ $(document).on('ready', function() {
                 $('.zone').last().on('click', function(eventObject) {
 
                   // Retrieve data for zone corresponding to click event
-                  var zoneIndex = $(this).index();
+                  var zoneIndex = data['zones'].length - $(this).index() - 1;
                   var zone = data['zones'][zoneIndex];
 
                   // Remove zone-list from DOM temporarily
