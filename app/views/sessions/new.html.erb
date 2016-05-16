@@ -8,6 +8,10 @@
     <%= label_tag :password %><br />
     <%= password_field_tag :password %>
   </div>
+  <div class="check_box">
+    <%= check_box_tag :remember, params[:remember], true %>
+    <%= label_tag :remember %>
+  </div>
   <div class="actions">
     <%= submit_tag "Login" %>
   </div>
