@@ -1,14 +1,16 @@
-<% @result[:zones].each do |zone| %>
-  <div class="">
-    <h3>COUNT: <%= zone[:count] %></h3>
-    <h2>HOTNESS: <%= zone[:hottness] %></h2>
-    <p><%= zone[:start_time] %> <strong>TO</strong> <%= zone[:end_time] %></p>
+<% if @result %>
+  <% @result[:zones].each do |zone| %>
     <div class="">
-      <% zone[:article_list].each do |article|%>
-        <p>
-          <%= article.title %>
-        </p>
-      <% end %>
+      <h3>COUNT: <%= zone[:count] %></h3>
+      <h2>HOTNESS: <%= zone[:hottness] %></h2>
+      <p><%= zone[:start_time] %> <strong>TO</strong> <%= zone[:end_time] %></p>
+      <div class="">
+        <% zone[:article_list].each do |article|%>
+          <p>
+            <%= article.title %>
+          </p>
+        <% end %>
+      </div>
     </div>
-  </div>
+  <% end %>
 <% end %>

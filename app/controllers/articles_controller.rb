@@ -7,7 +7,7 @@ class ArticlesController < ApplicationController
     @articles = Article.selecting_articles(permit_params).sort { |a, b| b.publication_time <=> a.publication_time }
     puts(@articles.size)
     # if find any articles, divide the article into zones.
-    if @articles
+    if @articles.any?
       @result = {zones: Article.dividing_into_zones(@articles)}
       @result[:keywords] = Article.getting_keyword(@articles)
       puts(@result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
