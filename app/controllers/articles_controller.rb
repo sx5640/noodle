@@ -13,7 +13,7 @@ class ArticlesController < ApplicationController
       puts(@result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
       # output the zones
       respond_to do |format|
-        format.html
+        # format.html
         format.json { render json: @result }
       end
     else

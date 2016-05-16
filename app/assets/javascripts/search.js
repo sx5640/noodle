@@ -1,4 +1,4 @@
-$(document).on('ready', function() {
+$(document).on('ready page:load', function() {
 
   var global_zoneList;
   var global_articleList;

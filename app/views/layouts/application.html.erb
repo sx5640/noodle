@@ -14,7 +14,7 @@
 
   <header>
    <nav class="nav-bar">
-      <div class="title"><a href="/">Noodle</a></div>
+      <div class="title"><a href="<%= root_path %>">Noodle</a></div>
       <ul class="nav-list">
         <% if current_user %>
           <li class="nav-item"><a href="<%= user_path(current_user) %>"><%= current_user.email %></a></li>
