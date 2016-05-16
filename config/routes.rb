@@ -1,9 +1,17 @@
 Rails.application.routes.draw do
+  get 'sessions/new'
+
+  post 'sessions/create'
+
+  get 'sessions/destroy'
+
   get 'articles/index'
 
   get 'articles/search'
 
   root 'articles#index'
+
+  resources :users, except: :index
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
