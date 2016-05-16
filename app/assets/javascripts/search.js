@@ -49,7 +49,7 @@ $(document).on('ready page:load', function() {
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                  search_string: $('#search').val()
+                  keyword: $('#search').val()
                 },
                 success: function(data) {
                   console.log(data);
