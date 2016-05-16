@@ -31,7 +31,7 @@ $(document).on('ready', function() {
           var templateZone = Handlebars.compile(sourceZone);
 
           // Loop through each zone and combine it with the templates
-          for ( var i = 0; i < data['zones'].length; i++ ) {
+          for ( var i = data['zones'].length - 1; i >= 0 ; i-- ) {
             console.log(data['zones'][i]);
 
             var zone = data['zones'][i];
@@ -85,7 +85,7 @@ $(document).on('ready', function() {
                 $('.zone').last().prepend("<div class='zone-month'>" + dateDisplay + "</div>");
 
                 // Display verticle zone connector line, except for the first zone
-                if (i !== 0) {
+                if (i !== data['zones'].length - 1) {
                   $('.zone').last().prepend("<div class='zone-connector'></div>");
                 }
 
@@ -94,7 +94,7 @@ $(document).on('ready', function() {
                 $('.zone').last().on('click', function(eventObject) {
 
                   // Retrieve data for zone corresponding to click event
-                  var zoneIndex = $(this).index();
+                  var zoneIndex = data['zones'].length - $(this).index() - 1;
                   var zone = data['zones'][zoneIndex];
 
                   // Remove zone-list from DOM temporarily
