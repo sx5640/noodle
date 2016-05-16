@@ -3,8 +3,11 @@ class ArticlesController < ApplicationController
   end
 
   def search
-    # get the result 
+    # get the result
     @result = Article.analyze_articles(permit_params)
+    if current_user
+      @result[:user_id] = current_user.id
+    end
     if @result
       respond_to do |format|
         # format.html

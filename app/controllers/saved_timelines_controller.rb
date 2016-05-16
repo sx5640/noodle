@@ -2,18 +2,18 @@ class SavedTimelinesController < ApplicationController
   def create
     new_saved_timeline = current_user.saved_timelines.new(saved_timeline_params)
     if new_saved_timeline.save
-      render "success".to_json
+      render json: { success: true }
     else
-      render "failed".to_json
+      render json: { success: false }
     end
   end
 
   def destroy
     @saved_timeline = SavedTimeline.find(params[:id])
     if @saved_timeline.destroy
-      render "success".to_json
+      render json: { success: true }
     else
-      render "failed".to_json
+      render json: { success: false }
     end
   end
 
@@ -31,7 +31,6 @@ class SavedTimelinesController < ApplicationController
         format.html
       end
     end
-  end
   end
 
   private

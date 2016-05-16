@@ -38,20 +38,24 @@ $(document).on('ready page:load', function() {
           // Add event handler for saving the timeline to the user model
           $('#save-timeline').on('click', function(eventObject) {
             eventObject.preventDefault();
-            alert('Save timeline!');
 
-            var url = '/timeline';
+            if (data.user_id) {
+              alert('Save timeline!');
 
-            $.ajax({
-              url: url,
-              type: 'POST',
-              dataType: 'json',
-              data: {
-                searchString: $('#search').val()
-              },
-              success: function(data) {
-              }
-            });
+              var url = '/users/' + data.user_id + '/saved_timelines';
+
+              $.ajax({
+                url: url,
+                type: 'POST',
+                dataType: 'json',
+                data: {
+                  search_string: $('#search').val()
+                },
+                success: function(data) {
+                  console.log(data);
+                }
+              });
+            }
           });
 
           // Loop through each zone and combine it with the templates
