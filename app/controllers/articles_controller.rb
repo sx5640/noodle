@@ -48,4 +48,5 @@ class ArticlesController < ApplicationController
     end
     return permitted_params
   end
+
 end
