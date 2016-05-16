@@ -71,28 +71,33 @@ class Article < ActiveRecord::Base
     # if timeframe given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword within the timeframe.
     if permitted_params[:start_time] && permitted_params[:end_time]
       keyword_search_result = self.joins(:keywords).where("
-        articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ILIKE ?",
-        permitted_params[:start_time], permitted_params[:end_time], "%#{permitted_params[:search]}%"
+        articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ~* ?",
+        permitted_params[:start_time], permitted_params[:end_time],
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       title_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND title ILIKE ?",
-        permitted_params[:start_time], permitted_params[:end_time], "%#{permitted_params[:search]}%"
+        "publication_time >= ? AND publication_time <= ? AND title ~* ?",
+        permitted_params[:start_time], permitted_params[:end_time],
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       abstract_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND abstract ILIKE ?",
-        permitted_params[:start_time], permitted_params[:end_time], "%#{permitted_params[:search]}%"
+        "publication_time >= ? AND publication_time <= ? AND abstract ~* ?",
+        permitted_params[:start_time], permitted_params[:end_time],
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       lead_paragraph_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND lead_paragraph ILIKE ?",
-        permitted_params[:start_time], permitted_params[:end_time], "%#{permitted_params[:search]}%"
+        "publication_time >= ? AND publication_time <= ? AND lead_paragraph ~* ?",
+        permitted_params[:start_time], permitted_params[:end_time],
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       snippet_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND snippet ILIKE ?",
-        permitted_params[:start_time], permitted_params[:end_time], "%#{permitted_params[:search]}%"
+        "publication_time >= ? AND publication_time <= ? AND snippet ~* ?",
+        permitted_params[:start_time], permitted_params[:end_time],
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       return keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result
@@ -100,23 +105,28 @@ class Article < ActiveRecord::Base
     else
       # if timeframe not given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword from all time
       keyword_search_result = self.joins(:keywords).where(
-        "keywords.name ILIKE ?", "%#{permitted_params[:search]}%"
+        "keywords.name ~* ?",
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       title_search_result = self.where(
-        "title ILIKE ?", "%#{permitted_params[:search]}%"
+        "title ~* ?",
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       abstract_search_result = self.where("
-        abstract ILIKE ?", "%#{permitted_params[:search]}%"
+        abstract ~* ?",
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       lead_paragraph_search_result = self.where(
-        "lead_paragraph ILIKE ?", "%#{permitted_params[:search]}%"
+        "lead_paragraph ~* ?",
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       snippet_search_result = self.where(
-        "snippet ILIKE ?", "%#{permitted_params[:search]}%"
+        "snippet ~* ?",
+        '\W' + "#{permitted_params[:search]}" + '\W'
       ).order(:publication_time)
 
       return keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result
