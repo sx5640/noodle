@@ -1,9 +1,10 @@
 Rails.application.routes.draw do
+
   get 'sessions/new'
 
   post 'sessions/create'
 
-  get 'sessions/destroy'
+  delete 'sessions/destroy'
 
   get 'articles/index'
 
@@ -11,7 +12,9 @@ Rails.application.routes.draw do
 
   root 'articles#index'
 
-  resources :users, except: :index
+  resources :users, except: :index do
+    resources :saved_timelines, only: [:show, :create, :destroy]
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

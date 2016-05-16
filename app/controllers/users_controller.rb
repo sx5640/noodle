@@ -36,6 +36,7 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
+    @saved_timelines = @user.saved_timelines.all
   end
 
   private

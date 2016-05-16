@@ -1,10 +1,25 @@
-class ArticlesController < ApplicationController
-  def index
+class SavedTimelinesController < ApplicationController
+  def create
+    new_saved_timeline = current_user.saved_timelines.new(saved_timeline_params)
+    if new_saved_timeline.save
+      render "success".to_json
+    else
+      render "failed".to_json
+    end
   end
 
-  def search
-    # get the result 
-    @result = Article.analyze_articles(permit_params)
+  def destroy
+    @saved_timeline = SavedTimeline.find(params[:id])
+    if @saved_timeline.destroy
+      render "success".to_json
+    else
+      render "failed".to_json
+    end
+  end
+
+  def show
+    saved_timeline = SavedTimeline.find(params[:id])
+    @result = Article.analyze_articles(saved_timeline)
     if @result
       respond_to do |format|
         # format.html
@@ -17,10 +32,10 @@ class ArticlesController < ApplicationController
       end
     end
   end
+  end
 
   private
-  # defining a method to clean up the params
-  def permit_params
+  def saved_timeline_params
     # permit only search terms and time frames
     permitted_params = params.permit(:search, start_time: ["(1i)", "(2i)", "(3i)", "(4i)", "(5i)"], end_time: ["(1i)", "(2i)", "(3i)", "(4i)", "(5i)"])
     # if there is a timeframe, clean up the timeframe and turn into DateTime object
@@ -42,5 +57,4 @@ class ArticlesController < ApplicationController
     end
     return permitted_params
   end
-
 end

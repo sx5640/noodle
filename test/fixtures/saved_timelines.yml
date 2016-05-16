@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_id: 1
+  keyword: MyString
+  start_time: 2016-05-16 15:49:34
+  end_time: 2016-05-16 15:49:34
+
+two:
+  user_id: 1
+  keyword: MyString
+  start_time: 2016-05-16 15:49:34
+  end_time: 2016-05-16 15:49:34
