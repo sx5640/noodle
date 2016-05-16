@@ -219,6 +219,11 @@ class Article < ActiveRecord::Base
     if articles.any?
       result = {zones: Article.divide_into_zones(articles)}
       result[:keywords] = Article.generate_keywords(articles)
+      result[:search_info] = {
+        search_string: permitted_params[:search],
+        start_time: articles.last.publication_time,
+        end_time: articles.first.publication_time
+      }
       puts(result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
       # output the zones
       return result

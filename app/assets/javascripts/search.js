@@ -49,7 +49,9 @@ $(document).on('ready page:load', function() {
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                  keyword: $('#search').val()
+                  keyword: data.search_info.search_string,
+                  start_time: data.search_info.start_time,
+                  end_time: data.search_info.end_time
                 },
                 success: function(data) {
                   console.log(data);
