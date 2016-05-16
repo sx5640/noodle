@@ -1,7 +1,7 @@
 $(document).on('ready page:load', function() {
 
-  var global_zoneList;
-  var global_articleList;
+  var global_timeline;
+  // var global_articleList; // This isn't needed right now
 
   // AJAX call to submit search terms and display the article results
   $('.search-form').on('submit', function(eventObject) {
@@ -17,7 +17,8 @@ $(document).on('ready page:load', function() {
         // Use Handlebars to compile our article summary templates and append the resulting html to the index page
         if (data) {
 
-          // First clear the article summary list
+          // First clear the timeline title and article summary list
+          $('.timeline-title').remove();
           $('#zone-list').empty();
 
           // Display Keywords for entire timeline
@@ -29,6 +30,29 @@ $(document).on('ready page:load', function() {
 
           var sourceZone = $('#template-zone').html();
           var templateZone = Handlebars.compile(sourceZone);
+
+          // Display Timeline title
+          var htmlTimelineTitle = '<h1 class="timeline-title">Timeline <a id="save-timeline" href="">*</a></h1>';
+          $('#timeline').prepend(htmlTimelineTitle);
+
+          // Add event handler for saving the timeline to the user model
+          $('#save-timeline').on('click', function(eventObject) {
+            eventObject.preventDefault();
+            alert('Save timeline!');
+
+            var url = '/timeline';
+
+            $.ajax({
+              url: url,
+              type: 'POST',
+              dataType: 'json',
+              data: {
+                searchString: $('#search').val()
+              },
+              success: function(data) {
+              }
+            });
+          });
 
           // Loop through each zone and combine it with the templates
           for ( var i = data['zones'].length - 1; i >= 0 ; i-- ) {
@@ -97,8 +121,8 @@ $(document).on('ready page:load', function() {
                   var zoneIndex = data['zones'].length - $(this).index() - 1;
                   var zone = data['zones'][zoneIndex];
 
-                  // Remove zone-list from DOM temporarily
-                  global_zoneList = $('#zone-list').detach();
+                  // Remove timeline from DOM temporarily
+                  global_timeline = $('#timeline').detach();
 
                   // Append new DOM element article-list
                   var htmlArticleList = '<ul class="article-list"></ul>';
@@ -139,8 +163,8 @@ $(document).on('ready page:load', function() {
     eventObject.preventDefault();
 
     // Detach article list and reattach timeline
-    global_articleList = $('article-list').detach();
-    $('.content-container').html(global_zoneList);
+    $('article-list').remove();
+    $('.content-container').html(global_timeline);
 
     // Remove back link
     $('#timeline-nav').empty();
