@@ -1,0 +1,17 @@
+#minimap-container {
+  float: right;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100px;
+  height: 0px;
+}
+
+.circle {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: #00c8ff;
+  background-color: #00c8ff;
+}
