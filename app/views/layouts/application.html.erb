@@ -17,7 +17,7 @@
       <div class="title"><a href="<%= root_path %>">Noodle</a></div>
       <ul class="nav-list">
         <% if current_user %>
-          <li class="nav-item username"><a href="<%= user_path(current_user) %>"><%= current_user.email %></a></li>
+          <li class="nav-item username"><a href="<%= user_path(current_user) %>">Logged in as <%= current_user.email %></a></li>
           <li class="nav-item"><%= link_to "Logout", sessions_destroy_path, :method => :delete %></li>
         <% else %>
           <li class="nav-item"><a href="<%= new_user_path %>">Sign Up</a></li>

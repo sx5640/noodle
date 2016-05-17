@@ -61,7 +61,6 @@ section h2 {
   float: right;
   margin: 0;
   padding: 0;
-  word-spacing: 2rem;
 }
 
 .nav-item {
@@ -71,6 +70,7 @@ section h2 {
   text-transform: uppercase;
   font-size: .735rem;
   font-weight: 500;
+  padding-left: 1.777777rem;
 
   a:visited {
     color: black;
