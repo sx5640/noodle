@@ -17,6 +17,8 @@ $(document).on('ready page:load', function() {
         // Use Handlebars to compile our article summary templates and append the resulting html to the index page
         if (data) {
 
+          var firstNonEmptyZoneDisplayed = false;
+
           // First clear the timeline title and article summary list
           $('#timeline-header').remove();
           $('#zone-list').empty();
@@ -118,7 +120,7 @@ $(document).on('ready page:load', function() {
                 $('.zone').last().prepend("<div class='zone-month'>" + dateDisplay + "</div>");
 
                 // Display verticle zone connector line, except for the first zone
-                if (i !== data['zones'].length - 1) {
+                if (firstNonEmptyZoneDisplayed) {
                   $('.zone').last().prepend("<div class='zone-connector'></div>");
                 }
 
@@ -153,6 +155,10 @@ $(document).on('ready page:load', function() {
                   // Show the top of the document instead of the bottom
                   $(document).scrollTop(0);
                 });
+
+                if (!firstNonEmptyZoneDisplayed) {
+                  firstNonEmptyZoneDisplayed = true;
+                }
               } else {
 
                 // If there are no articles, create an empty list item with class zone

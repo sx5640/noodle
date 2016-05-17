@@ -226,6 +226,7 @@ main {
 
 #save-timeline-button {
   @extend .timeline-title;
+  letter-spacing: normal;
 }
 
 .timeline-saved-message {
