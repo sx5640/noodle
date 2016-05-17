@@ -168,6 +168,10 @@ $(document).on('ready page:load', function() {
               }
             }
           }
+
+          // Render minimap
+
+          minimap.render(data['zones']);
         }
       }
     });
@@ -183,5 +187,41 @@ $(document).on('ready page:load', function() {
 
     // Remove back link
     $('#timeline-nav').empty();
+  });
+
+  $(window).scroll(function() {
+    console.log($(window).scrollTop());
+
+    var documentHeight = $(document).height();
+    var windowHeight = $(window).height();
+    var navHeight = $('.nav-bar').outerHeight();
+    var zoneListHeight = $('#zone-list').outerHeight();
+    var headerHeight = documentHeight - zoneListHeight;
+    var documentY = $(window).scrollTop();
+    // var searchSectionHeight = $('#search-section').outerHeight();
+    // var keywordsContainerHeight = $('#keywords-container').outerHeight();
+    // var timelineNavHeight = $('#timeline-nav').outerHeight();
+
+    console.log('document height: ', documentHeight);
+    console.log('window height: ', windowHeight);
+    console.log('nav height: ', navHeight);
+    console.log('zone list height: ', zoneListHeight);
+    console.log('document y: ', documentY);
+    // console.log('search height: ', searchSectionHeight);
+    // console.log('keywords height: ', keywordsContainerHeight);
+    // console.log('timeline nav height: ', timelineNavHeight);
+
+    var timelineY = documentY - headerHeight + windowHeight/2;
+
+    console.log('timeline y: ', timelineY);
+
+    var minimapY = timelineY * (500/zoneListHeight);
+
+    console.log('minimap y: ', minimapY);
+
+  //  if (url && $(window).scrollTop() > $(document).height() - $(window).height() - 50) {
+  //    $('.pagination').text("Fetching more products...");
+  //    return $.getScript(url);
+  //  }
   });
 });
