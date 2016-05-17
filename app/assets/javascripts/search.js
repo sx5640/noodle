@@ -32,7 +32,7 @@ $(document).on('ready page:load', function() {
           var templateZone = Handlebars.compile(sourceZone);
 
           // Display Timeline title
-          var htmlTimelineTitle = '<h1 class="timeline-title">Timeline <a id="save-timeline" href="">*</a></h1>';
+          var htmlTimelineTitle = '<h1 class="timeline-title">Timeline<a id="save-timeline" href="">*</a></h1>';
           $('#timeline').prepend(htmlTimelineTitle);
 
           // Add event handler for saving the timeline to the user model
