@@ -1,2 +1,8 @@
-<h1>Users#show</h1>
-<p>Find me in app/views/users/show.html.erb</p>
+<h1 class="userprofile-title">User</h1>
+<h2 class="userprofile-email"><%= @user.email %></h2>
+<h2 class="userprofile-savedtimelines-title">Noodles</h2>
+<ul class="userprofile-savedtimelines">
+  <% @saved_timelines.each do |timeline| %>
+    <li><a href="/" class="userprofile-savedtimeline"><%= timeline.keyword %></a></li>
+  <% end %>
+</ul>
