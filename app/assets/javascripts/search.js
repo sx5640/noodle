@@ -18,7 +18,7 @@ $(document).on('ready page:load', function() {
         if (data) {
 
           // First clear the timeline title and article summary list
-          $('.timeline-title').remove();
+          $('#timeline-header').remove();
           $('#zone-list').empty();
 
           // Display Keywords for entire timeline
@@ -32,18 +32,17 @@ $(document).on('ready page:load', function() {
           var templateZone = Handlebars.compile(sourceZone);
 
           // Display Timeline title
-          var htmlTimelineTitle = '<h1 class="timeline-title">Timeline<a id="save-timeline" href="">*</a></h1>';
+          var htmlTimelineTitle = '<div id="timeline-header"><h1 class="timeline-title">Timeline</h1></div>';
           $('#timeline').prepend(htmlTimelineTitle);
 
           if (data.user && data.user.saved_this_timeline === false) {
-            // Display Timeline title
-            var htmlTimelineTitle = '<h1 class="timeline-title">Timeline <a id="save-timeline" href="">*</a></h1>';
-            $('#timeline').prepend(htmlTimelineTitle);
+
+            var htmlTimelineSave =  '<h1 id="save-timeline-button"><a id="save-timeline" href="">*</a></h1>';
+            $('#timeline-header').append(htmlTimelineSave);
+
             // Add event handler for saving the timeline to the user model
             $('#save-timeline').on('click', function(eventObject) {
-            eventObject.preventDefault();
-
-              alert('Save timeline!');
+              eventObject.preventDefault();
 
               var url = '/users/' + data.user.user_id + '/saved_timelines';
 
@@ -58,10 +57,11 @@ $(document).on('ready page:load', function() {
                 },
                 success: function(data) {
                   console.log(data);
+                  $('#save-timeline-button').html('<h1 class="timeline-saved-message">saved</h1>');
                 }
               });
             });
-          };
+          }
 
           // Loop through each zone and combine it with the templates
           for ( var i = data['zones'].length - 1; i >= 0 ; i-- ) {

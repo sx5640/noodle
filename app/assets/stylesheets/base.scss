@@ -220,9 +220,20 @@ main {
   text-align: center;
   letter-spacing: 1rem;
   text-transform: uppercase;
-  padding-left: 1.333333rem;
-  padding-top: 1.333333rem;
-  padding-bottom: 1.333333rem;
+  padding-top: 1.777777rem;
+  padding-bottom: .75rem;
+}
+
+#save-timeline-button {
+  @extend .timeline-title;
+}
+
+.timeline-saved-message {
+  font-family: 'Fira Sans';
+  font-size: 1rem;
+  font-weight: 400;
+  text-transform: uppercase;
+  letter-spacing: normal;
 }
 
 .zone {
