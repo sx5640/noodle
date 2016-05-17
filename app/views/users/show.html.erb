@@ -3,6 +3,6 @@
 <h2 class="userprofile-savedtimelines-title">Noodles</h2>
 <ul class="userprofile-savedtimelines">
   <% @saved_timelines.each do |timeline| %>
-    <li><a href="/" class="userprofile-savedtimeline"><%= timeline.keyword %></a></li>
+    <li><a href="/" class="userprofile-savedtimeline"><%= timeline.search_string %></a></li>
   <% end %>
 </ul>
