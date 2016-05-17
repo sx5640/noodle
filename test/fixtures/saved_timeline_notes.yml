@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  text: MyText
+  zone_num: 1
+  saved_timeline_id: MyString
+
+two:
+  text: MyText
+  zone_num: 1
+  saved_timeline_id: MyString

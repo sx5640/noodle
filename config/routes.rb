@@ -1,5 +1,11 @@
 Rails.application.routes.draw do
 
+  get 'saved_timeline_notes/create'
+
+  get 'saved_timeline_notes/update'
+
+  get 'saved_timeline_notes/destroy'
+
   get 'sessions/new'
 
   post 'sessions/create'
@@ -13,7 +19,9 @@ Rails.application.routes.draw do
   root 'articles#index'
 
   resources :users, except: :index do
-    resources :saved_timelines, only: [:show, :create, :destroy]
+    resources :saved_timelines, only: [:show, :create, :destroy] do
+      resources :saved_timeline_notes, only: [:create, :destroy]
+    end
   end
 
   # The priority is based upon order of creation: first created -> highest priority.
