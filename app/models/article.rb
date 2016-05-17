@@ -1,6 +1,7 @@
 class Article < ActiveRecord::Base
   has_many :keyword_analyses
   has_many :keywords, through: :keyword_analyses
+  has_many :saved_timelines
   # defining a method dedicated to get articles from NYTimes
   def self.get_nytimes_articles(search_terms, begin_date, end_date)
     # loop through page 0 to page 100

@@ -31,15 +31,15 @@ $(document).on('ready page:load', function() {
           var sourceZone = $('#template-zone').html();
           var templateZone = Handlebars.compile(sourceZone);
 
-          // Display Timeline title
-          var htmlTimelineTitle = '<h1 class="timeline-title">Timeline <a id="save-timeline" href="">*</a></h1>';
-          $('#timeline').prepend(htmlTimelineTitle);
 
-          // Add event handler for saving the timeline to the user model
-          $('#save-timeline').on('click', function(eventObject) {
+          if (data.user && data.user.saved_this_timeline === false) {
+            // Display Timeline title
+            var htmlTimelineTitle = '<h1 class="timeline-title">Timeline <a id="save-timeline" href="">*</a></h1>';
+            $('#timeline').prepend(htmlTimelineTitle);
+            // Add event handler for saving the timeline to the user model
+            $('#save-timeline').on('click', function(eventObject) {
             eventObject.preventDefault();
 
-            if (data.user_id) {
               alert('Save timeline!');
 
               var url = '/users/' + data.user.user_id + '/saved_timelines';
@@ -57,8 +57,8 @@ $(document).on('ready page:load', function() {
                   console.log(data);
                 }
               });
-            }
-          });
+            });
+          };
 
           // Loop through each zone and combine it with the templates
           for ( var i = data['zones'].length - 1; i >= 0 ; i-- ) {
