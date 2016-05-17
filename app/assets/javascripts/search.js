@@ -31,6 +31,9 @@ $(document).on('ready page:load', function() {
           var sourceZone = $('#template-zone').html();
           var templateZone = Handlebars.compile(sourceZone);
 
+          // Display Timeline title
+          var htmlTimelineTitle = '<h1 class="timeline-title">Timeline<a id="save-timeline" href="">*</a></h1>';
+          $('#timeline').prepend(htmlTimelineTitle);
 
           if (data.user && data.user.saved_this_timeline === false) {
             // Display Timeline title
