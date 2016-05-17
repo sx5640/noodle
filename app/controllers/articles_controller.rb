@@ -6,7 +6,16 @@ class ArticlesController < ApplicationController
     # get the result
     @result = Article.analyze_articles(permit_params)
     if current_user
-      @result[:user_id] = current_user.id
+      @result[:user] = {user_id: current_user.id}
+      if SavedTimeline.joins(:users).where("
+        users.id = ? AND saved_timelines.keyword = ? AND saved_timelines.start_time = ? AND saved_timelines.end_time = ?",
+        current_user.id, @result[:search_info][:search_string], @result[:search_info][:start_time],
+        @result[:search_info][:search_string]
+        )
+        @result[:user][:saved_this_timeline] = true
+      else
+        @result[:user][:saved_this_timeline] = false
+      end
     end
     if @result
       respond_to do |format|

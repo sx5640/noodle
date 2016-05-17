@@ -36,7 +36,7 @@ class SavedTimelinesController < ApplicationController
   private
   def saved_timeline_params
     # permit only search terms and time frames
-    permitted_params = params.permit(:keyword, :start_time, :end_time)
+    permitted_params = params.permit(:search_string, :start_time, :end_time)
     permitted_params[:start_time] = permitted_params[:start_time].to_datetime
     permitted_params[:end_time] = permitted_params[:end_time].to_datetime
     return permitted_params

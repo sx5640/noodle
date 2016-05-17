@@ -42,14 +42,14 @@ $(document).on('ready page:load', function() {
             if (data.user_id) {
               alert('Save timeline!');
 
-              var url = '/users/' + data.user_id + '/saved_timelines';
+              var url = '/users/' + data.user.user_id + '/saved_timelines';
 
               $.ajax({
                 url: url,
                 type: 'POST',
                 dataType: 'json',
                 data: {
-                  keyword: data.search_info.search_string,
+                  search_string: data.search_info.search_string,
                   start_time: data.search_info.start_time,
                   end_time: data.search_info.end_time
                 },
