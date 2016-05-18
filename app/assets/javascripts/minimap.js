@@ -9,10 +9,6 @@ var minimap = (function() {
       var minimapHeight = 500;
       var top = (windowHeight - minimapHeight) / 2;
 
-      // console.log('window height ', windowHeight);
-      // console.log('minimap height ', minimapHeight);
-      // console.log('top ', top);
-
       $('#minimap-container').css('height', minimapHeight + 'px');
       $('#minimap-container').css('top', top);
 
@@ -29,7 +25,7 @@ var minimap = (function() {
           if (zone.count > 0) {
             var htmlCircle = '<div class="circle"></div>';
             var circle;
-            var size = 2 + (zone.hotness * zone.hotness) * .25;
+            var size = Math.floor(3 + zone.hotness * zone.hotness * .25);
 
             $('#minimap-container').append(htmlCircle);
             circle = $('.circle').last();
@@ -37,7 +33,7 @@ var minimap = (function() {
             circle.css('left', (50 - size / 2) + 'px');
             circle.css('width', size + 'px');
             circle.css('height', size + 'px')
-            // circle.css('opacity', (zone.hotness * .1));
+            circle.css('opacity', (zone.hotness * .2));
             displayCount++;
           }
         }

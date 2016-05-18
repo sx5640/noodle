@@ -202,26 +202,52 @@ $(document).on('ready page:load', function() {
     // var keywordsContainerHeight = $('#keywords-container').outerHeight();
     // var timelineNavHeight = $('#timeline-nav').outerHeight();
 
-    console.log('document height: ', documentHeight);
-    console.log('window height: ', windowHeight);
-    console.log('nav height: ', navHeight);
-    console.log('zone list height: ', zoneListHeight);
-    console.log('document y: ', documentY);
+    // console.log('document height: ', documentHeight);
+    // console.log('window height: ', windowHeight);
+    // console.log('nav height: ', navHeight);
+    // console.log('zone list height: ', zoneListHeight);
+    // console.log('document y: ', documentY);
     // console.log('search height: ', searchSectionHeight);
     // console.log('keywords height: ', keywordsContainerHeight);
     // console.log('timeline nav height: ', timelineNavHeight);
 
     var timelineY = documentY - headerHeight + windowHeight/2;
 
-    console.log('timeline y: ', timelineY);
+    // console.log('timeline y: ', timelineY);
 
     var minimapY = timelineY * (500/zoneListHeight);
 
-    console.log('minimap y: ', minimapY);
+    // console.log('minimap y: ', minimapY);
 
-  //  if (url && $(window).scrollTop() > $(document).height() - $(window).height() - 50) {
-  //    $('.pagination').text("Fetching more products...");
-  //    return $.getScript(url);
-  //  }
+    var index = Math.floor(minimapY / 500 * $('.circle').size());
+
+    if (index < 0) {
+      index = 0;
+    }
+
+    var circleInFocus = $('.circle').eq(index);
+
+    // console.log('index: ', index);
+    // console.log('circle in focus: ', circleInFocus);
+
+    var circleWidth = circleInFocus.css('width');
+    var newCircleWidth = parseInt(circleWidth) * 2;
+    // console.log('circleWidth: ', circleWidth);
+    // console.log('newCircleWidth: ', newCircleWidth);
+
+    // circleInFocus.css('width', newCircleWidth + 'px');
+    // circleInFocus.css('height', newCircleWidth + 'px');
+
+    // circleInFocus.css('width', '100px');
+    // circleInFocus.css('height', '100px');
+
+    // circleInFocus.css('background-color', 'black');
+
+    $('.minimap-circle-pop').removeClass('minimap-circle-pop');
+    if (!circleInFocus.hasClass('minimap-circle-pop')) {
+      circleInFocus.toggleClass('minimap-circle-pop');
+    }
+
+    // console.log('new circleInFocus: ', circleInFocus.css('width'));
   });
 });
