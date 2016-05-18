@@ -4,16 +4,18 @@ class Article < ActiveRecord::Base
   has_many :saved_timelines
   # defining a method dedicated to get articles from NYTimes
   def self.get_nytimes_articles(search_terms, begin_date, end_date)
+    articles = []
     # loop through page 0 to page 100
     for i in (0 .. 100)
       # get 10 articles with given keyword, timeframe and page #
-      response = HTTParty.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=#{search_terms}&page=#{i}&begin_date=#{begin_date}&end_date=#{end_date}&api-key=#{Rails.application.secrets.nytimes_key}")
+      response = HTTParty.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=#{search_terms}&page=#{i}&begin_date=#{begin_date}&end_date=#{end_date}&sort=newest&api-key=#{Rails.application.secrets.nytimes_key}")
       puts(i)
       # if no article returns, break the loop
       if response["response"]["docs"].empty?
         break
       else
         # iterate through the 10 articles get from each call, and clean up the data
+        articles << response["response"]["docs"]
         response["response"]["docs"].each do |entry|
           # select data from each article where the JSON attributes has the same name with out Article class object.
           # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
@@ -38,7 +40,7 @@ class Article < ActiveRecord::Base
             keyword_temp = keyword['value'].split(' (')
             keyword['value'] = keyword_temp[0]
             # this is to reformat names from Musk, Elon to Elon Musk
-            if keyword['name'] == 'persons'
+            if keyword['value'] && keyword['name'] == 'persons'
               name_temp = keyword['value'].split(', ')
               if name_temp[1]
                 keyword['value'] = name_temp[1] + ' ' + name_temp[0]
@@ -64,10 +66,29 @@ class Article < ActiveRecord::Base
           end
         end
       end
-
     end
+    return articles
   end
   # defining a method that select articles based on the data given from the params
+  def self.get_all_nytimes_articles(search_terms, begin_date, end_date, step)
+    case step
+    when "year"
+      step = 1.year
+    when "month"
+      step = 1.month
+    else
+      step = step.day
+    end
+    end_time_cycle = Date.strptime(end_date.to_s,'%Y%m%d')
+    start_time_cycle = end_time_cycle - step
+    while start_time_cycle.strftime('%Y%m%d').to_i > begin_date
+      puts "#{start_time_cycle} To #{end_time_cycle}"
+      articles = Article.get_nytimes_articles(search_terms, start_time_cycle.strftime('%Y%m%d'), end_time_cycle.strftime('%Y%m%d'))
+      end_time_cycle -= (step + 1.day)
+      start_time_cycle -= (step + 1.day)
+    end
+  end
+
   def self.select_articles_from_database(permitted_params)
     # if timeframe given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword within the timeframe.
     if permitted_params[:start_time] && permitted_params[:end_time]
