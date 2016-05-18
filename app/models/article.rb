@@ -234,4 +234,27 @@ class Article < ActiveRecord::Base
     end
   end
 
+  def self.write_txt(permitted_params)
+    articles = Article.select_articles_from_database(permitted_params).sort { |a, b| b.publication_time <=> a.publication_time }
+
+    begin_date = articles.last.publication_time
+    end_date = articles.first.publication_time
+
+    i = 0
+    if File.exist?('python/data.txt')
+      File.delete('python/data.txt')
+    end
+    File.new('python/data.txt', "w+")
+    while begin_date + i.day <= end_date
+      article_in_month = articles.select { |article|
+      article.publication_time >= begin_date + i.day &&
+      article.publication_time < begin_date + (i+1).day}
+      write_in = "#{sprintf("%03d", i)}    #{sprintf("%02d", article_in_month.length)}\n"
+      open('python/data.txt', 'a') { |f|
+        f.puts write_in
+      }
+      i += 1
+    end
+  end
+
 end
