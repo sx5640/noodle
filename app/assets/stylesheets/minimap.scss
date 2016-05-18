@@ -20,10 +20,11 @@
   &.minimap-circle-pop {
     background-color: white;
     border: .5px solid #00c8ff;
+    // border: .5px solid #e20090;
 
     transition-property: all;
     transition-duration: .5s;
-    transform: scale(2);
+    transform: scale(3);
     z-index: 1;
   }
 }
