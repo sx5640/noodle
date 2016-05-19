@@ -21,6 +21,7 @@ $(document).on('ready page:load', function() {
 
         // Render minimap
         minimap.render(data['zones']);
+        updateMinimap();
       }
     });
   }
@@ -206,6 +207,7 @@ $(document).on('ready page:load', function() {
 
             // Render minimap
             minimap.render(data['zones']);
+            updateMinimap();
 
             // Add a 'back to timeline' link - the most basic timeline navigation
             var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
@@ -269,6 +271,7 @@ $(document).on('ready page:load', function() {
 
     // Re-render the minimap to reflect the current timeline view
     minimap.render(global_data[global_data.length - 1]['zones']);
+    updateMinimap();
 
     // Remove back link if we're back at the root timeline
     if(global_views.length === 1) {
@@ -277,6 +280,10 @@ $(document).on('ready page:load', function() {
   });
 
   $(window).scroll(function() {
+    updateMinimap();
+  });
+
+  function updateMinimap() {
     var documentHeight = $(document).height();
     var windowHeight = $(window).height();
     var navHeight = $('.nav-bar').outerHeight();
@@ -299,5 +306,38 @@ $(document).on('ready page:load', function() {
     if (!circleInFocus.hasClass('minimap-circle-pop')) {
       circleInFocus.toggleClass('minimap-circle-pop');
     }
-  });
+  }
+
+  // Event handlers to detect mouseover and click events on minimap
+  $('#minimap-container').on('mouseover', function(eventObject) {
+    var source = eventObject.target;
+
+    if ($(source).hasClass('circle')) {
+      $('.minimap-circle-hover').removeClass('minimap-circle-hover');
+      $(source).toggleClass('minimap-circle-hover');
+    }
+  })
+
+  $('#minimap-container').on('mouseout', function(eventObject) {
+    $('.minimap-circle-hover').removeClass('minimap-circle-hover');
+    updateMinimap();
+  })
+
+  $('#minimap-container').on('click', function(eventObject) {
+    var offset = $(this).offset();
+    var minimapX = eventObject.pageX - offset.left;
+    var minimapY = eventObject.pageY - offset.top;
+    var minimapHeight = 500;
+    var documentHeight = $(document).height();
+    var windowHeight = $(window).height();
+    var zoneListHeight = $('#zone-list').outerHeight();
+    var headerHeight = documentHeight - zoneListHeight;
+
+    var newY = minimapY/minimapHeight * zoneListHeight;// + headerHeight;
+
+    console.log('newY ', newY);
+
+    $(document).scrollTop(newY);
+    // $(document).animate({ scrollTop:newY }, 'slow');
+  })
 });

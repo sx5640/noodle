@@ -27,4 +27,14 @@
     transform: scale(3);
     z-index: 1;
   }
+
+  &.minimap-circle-hover {
+    background-color: #00c8ff;
+    // border: .5px solid #e20090;
+
+    transition-property: all;
+    transition-duration: .5s;
+    transform: scale(2);
+    z-index: 1;
+  }
 }
