@@ -162,30 +162,21 @@ $(document).on('ready page:load', function() {
   $('.content-container').on('click', function(eventObject) {
 
     var matchedZones = $(eventObject.target).closest('.zone');
-    console.log(matchedZones);
-    console.log(matchedZones.size());
 
     if (matchedZones.size() > 0) {
 
       var clickedZone = matchedZones[0];
-      console.log('CLICKED ZONE: ', clickedZone);
 
       var activeViewIndex = global_views.length - 1;
       var data = global_data[activeViewIndex];
       var zoneIndex = data['zones'].length - $(clickedZone).index() - 1;
       var zone = data['zones'][zoneIndex];
 
-      console.log('activeViewIndex: ', activeViewIndex);
-      console.log('zoneIndex: ', zoneIndex);
-      console.log('zone: ', zone);
-
       if (zone.count >= 20) {
 
         ////
         // Branch 1 (20 or more articles) - Create and render sub timeline
         ////
-
-        console.log('Show sub timeline!');
 
         var start_date = new Date(zone.start_time);
         var end_date = new Date(zone.end_time);
@@ -200,6 +191,10 @@ $(document).on('ready page:load', function() {
 
             // Render minimap
             minimap.render(data['zones']);
+
+            // Add a 'back to timeline' link - the most basic timeline navigation
+            var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+            $('#timeline-nav').html(htmlBackToTimeline);
           }
         });
 
@@ -232,6 +227,11 @@ $(document).on('ready page:load', function() {
           timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
         }
 
+        global_views.push($('.article-list'));
+        global_data.push('');
+
+        minimap.render(null);
+
         // Show the top of the document instead of the bottom
         $(document).scrollTop(0);
       }
@@ -240,23 +240,25 @@ $(document).on('ready page:load', function() {
 
   // Add event handler to go back to timeline via AJAX
   $('#timeline-nav').on('click', function(eventObject) {
-    console.log('BACK!!!');
     eventObject.preventDefault();
 
-    // Detach article list and reattach timeline
-    $('article-list').remove();
-    // console.log('global_views before: ', global_views);
-    // var discardView = global_views.pop();
-    // console.log('global_views after: ', global_views);
-    $('.content-container').html(global_views[0]);
+    // Remove current view
+    $('.content-container').empty();
 
-    // var showView = global_views[global_views.length() - 1];
-    // console.log('discardView ', discardView);
-    // console.log('showView', showView);
-    // $('.content-container').html(global_views[global_views.length() - 1]);
+    // Pop the saved dom tree for current view
+    global_views.pop();
+    global_data.pop();
 
-    // Remove back link
-    $('#timeline-nav').empty();
+    // Add the previous view (now the last view in the view stack) to the live dom, displaying it
+    $('.content-container').html(global_views[global_views.length - 1]);
+
+    // Re-render the minimap to reflect the current timeline view
+    minimap.render(global_data[global_data.length - 1]['zones']);
+
+    // Remove back link if we're back at the root timeline
+    if(global_views.length === 1) {
+      $('#timeline-nav').empty();
+    }
   });
 
   $(window).scroll(function() {
