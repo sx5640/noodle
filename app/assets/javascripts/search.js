@@ -4,10 +4,13 @@ $(document).on('ready page:load', function() {
   var global_data = [];
 
   // AJAX call to submit search terms and display the article results
-  $('.search-form').on('submit', function(eventObject) {
-    eventObject.preventDefault();
-    var url = '/articles/search?utf8=%E2%9C%93&search=' + $('#search').val();
-
+  var newSearch = function(search_string, start_time, end_time) {
+    if (start_time && end_time) {
+      var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string + '&start_time=' + start_time + '&end_time=' + end_time
+    }
+    else {
+      var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string;
+    }
     $.ajax({
       url: url,
       type: 'GET',
@@ -20,6 +23,18 @@ $(document).on('ready page:load', function() {
         minimap.render(data['zones']);
       }
     });
+  }
+
+  // If there are data in the data attribute, do an automatic search
+  presetData = $('#search-section').data()
+  if (presetData && presetData.searchString) {
+    newSearch(presetData.searchString, presetData.startTime, presetData.endTime)
+  }
+
+  // Submit search terms and send AJAX call
+  $('.search-form').on('submit', function(eventObject) {
+    eventObject.preventDefault();
+    newSearch($('.search-form #search').val())
   });
 
   function pushTimelineView(data) {

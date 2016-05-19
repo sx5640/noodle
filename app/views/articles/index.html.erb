@@ -1,5 +1,6 @@
 <main>
-  <div id="search-section">
+  <%= tag("div", id: "search-section", data: params) %>
+
     <%= form_tag articles_search_path, method: :get, class: "search-form" do %>
       <%= text_field_tag(
           :search,
