@@ -1,35 +1,39 @@
 $(document).on('ready page:load', function() {
 
-  var global_timeline;
-  // var global_articleList; // This isn't needed right now
+  var global_views = [];
+  var global_data = [];
 
   // AJAX call to submit search terms and display the article results
-  if ($(".userprofile-savedtimeline").length !== 0) {
-    $(".userprofile-savedtimeline").on('click', function(eventObject) {
-      var url = this.href;
-      eventObject.preventDefault();
-      $.ajax({
-        url: url,
-        type: 'GET',
-        dataType: 'json',
-        success: function (data) {
-          $('.userprofile').remove();
-          displaySearchResult(data)
-        }
-      });
-    })
-  }
+  $('.search-form').on('submit', function(eventObject) {
+    eventObject.preventDefault();
+    var url = '/articles/search?utf8=%E2%9C%93&search=' + $('#search').val();
 
-  var displaySearchResult = function(data) {
+    $.ajax({
+      url: url,
+      type: 'GET',
+      dataType: 'json',
+      success: function(data) {
+        // Build timeline, display it and push it onto stack along with its data
+        pushTimelineView(data);
+
+        // Render minimap
+        minimap.render(data['zones']);
+      }
+    });
+  });
+
+  function pushTimelineView(data) {
 
     // Use Handlebars to compile our article summary templates and append the resulting html to the index page
     if (data) {
 
       var firstNonEmptyZoneDisplayed = false;
 
-      // First clear the timeline title and article summary list
-      $('#timeline-header').remove();
-      $('#zone-list').empty();
+      // Remove timeline from DOM temporarily
+      $('#timeline').detach();
+
+      var htmlTimeline = '<div id="timeline"><ul id="zone-list"></ul></div>';
+      var root = $('.content-container').html(htmlTimeline);
 
       // Display Keywords for entire timeline
       timeline.replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
@@ -47,7 +51,7 @@ $(document).on('ready page:load', function() {
 
       if (data.user && data.user.saved_this_timeline === false) {
 
-        var htmlTimelineSave =  '<h1 id="save-timeline-button"><a id="save-timeline" href="">*</a></h1>';
+        var htmlTimelineSave = '<h1 id="save-timeline-button"><a id="save-timeline" href="">*</a></h1>';
         $('#timeline-header').append(htmlTimelineSave);
 
         // Add event handler for saving the timeline to the user model
@@ -127,42 +131,10 @@ $(document).on('ready page:load', function() {
             dateDisplay = dateDisplay.toUpperCase();
             $('.zone').last().prepend("<div class='zone-month'>" + dateDisplay + "</div>");
 
-            // Display verticle zone connector line, except for the first zone
+            // Display vertical zone connector line, except for the first zone
             if (firstNonEmptyZoneDisplayed) {
               $('.zone').last().prepend("<div class='zone-connector'></div>");
             }
-
-            // Bind an eventhandler to each newly created zone to handle zooming
-            // When user clicks into a zone, display the articles view
-            $('.zone').last().on('click', function(eventObject) {
-
-              // Retrieve data for zone corresponding to click event
-              var zoneIndex = data['zones'].length - $(this).index() - 1;
-              var zone = data['zones'][zoneIndex];
-
-              // Remove timeline from DOM temporarily
-              global_timeline = $('#timeline').detach();
-
-              // Append new DOM element article-list
-              var htmlArticleList = '<ul class="article-list"></ul>';
-              $('.content-container').append(htmlArticleList);
-
-              // Add a 'back to timeline' link - the most basic timeline navigation
-              var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
-              $('#timeline-nav').html(htmlBackToTimeline);
-
-              // Construct each article using the article-summary - reuse template-zone for now
-              for (var i = 0; i < zone.count; i++) {
-                var htmlArticle = templateZone(zone.article_list[i]);
-                $('.article-list').append(htmlArticle);
-
-                // Append first 3 keywords
-                timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
-              }
-
-              // Show the top of the document instead of the bottom
-              $(document).scrollTop(0);
-            });
 
             if (!firstNonEmptyZoneDisplayed) {
               firstNonEmptyZoneDisplayed = true;
@@ -177,66 +149,127 @@ $(document).on('ready page:load', function() {
         }
       }
 
-      // Render minimap
+      // Push the new view and data
 
-      minimap.render(data['zones']);
+      global_views.push($('#timeline'));
+      global_data.push(data);
     }
   }
 
+  // Click event handler to change views when a user clicks on a zone
+  // If the number of articles in the zone is < 20, an articles view will be displayed
+  // Otherwise, another timeline will be displayed, the data for that timeline will be via an ajax call
+  $('.content-container').on('click', function(eventObject) {
 
-  $('.search-form').on('submit', function(eventObject) {
-    eventObject.preventDefault();
-    var url = '/articles/search?utf8=%E2%9C%93&search=' + $('#search').val();
+    var matchedZones = $(eventObject.target).closest('.zone');
 
-    $.ajax({
-      url: url,
-      type: 'GET',
-      dataType: 'json',
-      success: displaySearchResult
-    });
+    if (matchedZones.size() > 0) {
+
+      var clickedZone = matchedZones[0];
+
+      var activeViewIndex = global_views.length - 1;
+      var data = global_data[activeViewIndex];
+      var zoneIndex = data['zones'].length - $(clickedZone).index() - 1;
+      var zone = data['zones'][zoneIndex];
+
+      if (zone.count >= 20) {
+
+        ////
+        // Branch 1 (20 or more articles) - Create and render sub timeline
+        ////
+
+        var start_date = new Date(zone.start_time);
+        var end_date = new Date(zone.end_time);
+        var url = '/articles/search?utf8=%E2%9C%93&search=' + data.search_info.search_string + '&start_time=' + zone.start_time + '&end_time=' + zone.end_time;
+        $.ajax({
+          url: url,
+          type: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            // Build timeline, display it and push it onto stack along with its data
+            pushTimelineView(data);
+
+            // Render minimap
+            minimap.render(data['zones']);
+
+            // Add a 'back to timeline' link - the most basic timeline navigation
+            var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+            $('#timeline-nav').html(htmlBackToTimeline);
+          }
+        });
+
+      } else {
+
+        ////
+        // Branch 2 (less than 20 articles) - Create and render articles view
+        ////
+
+        // Remove timeline from DOM temporarily
+        $('#timeline').detach();
+
+        // Append new DOM element article-list
+        var htmlArticleList = '<ul class="article-list"></ul>';
+        $('.content-container').append(htmlArticleList);
+
+        // Add a 'back to timeline' link - the most basic timeline navigation
+        var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+        $('#timeline-nav').html(htmlBackToTimeline);
+
+        // Construct each article using the article-summary - reuse template-zone for now
+        var sourceZone = $('#template-zone').html();
+        var templateZone = Handlebars.compile(sourceZone);
+
+        for (var i = 0; i < zone.count; i++) {
+          var htmlArticle = templateZone(zone.article_list[i]);
+          $('.article-list').append(htmlArticle);
+
+          // Append first 3 keywords
+          timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
+        }
+
+        global_views.push($('.article-list'));
+        global_data.push('');
+
+        minimap.render(null);
+
+        // Show the top of the document instead of the bottom
+        $(document).scrollTop(0);
+      }
+    }
   });
+
   // Add event handler to go back to timeline via AJAX
   $('#timeline-nav').on('click', function(eventObject) {
     eventObject.preventDefault();
 
-    // Detach article list and reattach timeline
-    $('article-list').remove();
-    $('.content-container').html(global_timeline);
+    // Remove current view
+    $('.content-container').empty();
 
-    // Remove back link
-    $('#timeline-nav').empty();
+    // Pop the saved dom tree for current view
+    global_views.pop();
+    global_data.pop();
+
+    // Add the previous view (now the last view in the view stack) to the live dom, displaying it
+    $('.content-container').html(global_views[global_views.length - 1]);
+
+    // Re-render the minimap to reflect the current timeline view
+    minimap.render(global_data[global_data.length - 1]['zones']);
+
+    // Remove back link if we're back at the root timeline
+    if(global_views.length === 1) {
+      $('#timeline-nav').empty();
+    }
   });
 
   $(window).scroll(function() {
-    console.log($(window).scrollTop());
-
     var documentHeight = $(document).height();
     var windowHeight = $(window).height();
     var navHeight = $('.nav-bar').outerHeight();
     var zoneListHeight = $('#zone-list').outerHeight();
     var headerHeight = documentHeight - zoneListHeight;
     var documentY = $(window).scrollTop();
-    // var searchSectionHeight = $('#search-section').outerHeight();
-    // var keywordsContainerHeight = $('#keywords-container').outerHeight();
-    // var timelineNavHeight = $('#timeline-nav').outerHeight();
-
-    // console.log('document height: ', documentHeight);
-    // console.log('window height: ', windowHeight);
-    // console.log('nav height: ', navHeight);
-    // console.log('zone list height: ', zoneListHeight);
-    // console.log('document y: ', documentY);
-    // console.log('search height: ', searchSectionHeight);
-    // console.log('keywords height: ', keywordsContainerHeight);
-    // console.log('timeline nav height: ', timelineNavHeight);
-
     var timelineY = documentY - headerHeight + windowHeight/2;
-
-    // console.log('timeline y: ', timelineY);
-
     var minimapY = timelineY * (500/zoneListHeight);
-
-    // console.log('minimap y: ', minimapY);
-
     var index = Math.floor(minimapY / 500 * $('.circle').size());
 
     if (index < 0) {
@@ -244,28 +277,12 @@ $(document).on('ready page:load', function() {
     }
 
     var circleInFocus = $('.circle').eq(index);
-
-    // console.log('index: ', index);
-    // console.log('circle in focus: ', circleInFocus);
-
     var circleWidth = circleInFocus.css('width');
     var newCircleWidth = parseInt(circleWidth) * 2;
-    // console.log('circleWidth: ', circleWidth);
-    // console.log('newCircleWidth: ', newCircleWidth);
-
-    // circleInFocus.css('width', newCircleWidth + 'px');
-    // circleInFocus.css('height', newCircleWidth + 'px');
-
-    // circleInFocus.css('width', '100px');
-    // circleInFocus.css('height', '100px');
-
-    // circleInFocus.css('background-color', 'black');
 
     $('.minimap-circle-pop').removeClass('minimap-circle-pop');
     if (!circleInFocus.hasClass('minimap-circle-pop')) {
       circleInFocus.toggleClass('minimap-circle-pop');
     }
-
-    // console.log('new circleInFocus: ', circleInFocus.css('width'));
   });
 });

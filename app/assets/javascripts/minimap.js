@@ -12,7 +12,7 @@ var minimap = (function() {
       $('#minimap-container').css('height', minimapHeight + 'px');
       $('#minimap-container').css('top', top);
 
-      if (zones.length > 0) {
+      if (zones && zones.length > 0) {
         var displayCount = 0;
         var distance = 500 / minimap.numberOfNonEmptyZones(zones);
         var topOffset = distance / 2;

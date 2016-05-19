@@ -33,16 +33,16 @@ class ArticlesController < ApplicationController
   private
   # defining a method to clean up the params
   def permit_params
-    # permit only search terms and time frames
-    permitted_params = params.permit(:search, :start_time, :end_time)
-    # if there is a timeframe, clean up the timeframe and turn into DateTime object
-    if permitted_params[:start_time] && permitted_params[:end_time]
-      permitted_params[:start_time] = DateTime.parse(
-        permitted_params[:start_time])
-      permitted_params[:end_time] = DateTime.parse(
-        permitted_params[:end_time])
-    end
-    return permitted_params
-  end
+     # permit only search terms and time frames
+     permitted_params = params.permit(:search, :start_time, :end_time)
+     # if there is a timeframe, clean up the timeframe and turn into DateTime object
+     if permitted_params[:start_time] && permitted_params[:end_time]
+       permitted_params[:start_time] = DateTime.parse(
+         permitted_params[:start_time])
+       permitted_params[:end_time] = DateTime.parse(
+         permitted_params[:end_time])
+     end
+     return permitted_params
+   end
 
 end
