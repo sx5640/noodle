@@ -29,6 +29,9 @@ $(document).on('ready page:load', function() {
 
       var firstNonEmptyZoneDisplayed = false;
 
+      // Remove timeline from DOM temporarily
+      $('#timeline').detach();
+
       var htmlTimeline = '<div id="timeline"><ul id="zone-list"></ul></div>';
       var root = $('.content-container').html(htmlTimeline);
 
@@ -177,8 +180,35 @@ $(document).on('ready page:load', function() {
       console.log('zone: ', zone);
 
       if (zone.count >= 20) {
+
+        ////
+        // Branch 1 (20 or more articles) - Create and render sub timeline
+        ////
+
         console.log('Show sub timeline!');
+
+        var start_date = new Date(zone.start_time);
+        var end_date = new Date(zone.end_time);
+        var url = '/articles/search?utf8=%E2%9C%93&search=' + data.search_info.search_string + '&start_time=' + zone.start_time + '&end_time=' + zone.end_time;
+        $.ajax({
+          url: url,
+          type: 'GET',
+          dataType: 'json',
+          success: function(data) {
+            // Build timeline, display it and push it onto stack along with its data
+            pushTimelineView(data);
+
+            // Render minimap
+            minimap.render(data['zones']);
+          }
+        });
+
       } else {
+
+        ////
+        // Branch 2 (less than 20 articles) - Create and render articles view
+        ////
+
         // Remove timeline from DOM temporarily
         $('#timeline').detach();
 
