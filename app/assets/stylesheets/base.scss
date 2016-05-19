@@ -36,11 +36,18 @@ section h2 {
 */
 
 .nav-bar {
-  background-color: white;
+  width: 100%;
   color: black;
-  overflow: hidden;
   height: 60px;
   padding: 0 30px;
+  position: fixed;
+  z-index: 1000;
+}
+
+.nav-background {
+  overflow: hidden;
+  background-color: white;
+  opacity: .95;
 }
 
 .title {
