@@ -1,67 +1,8 @@
-<main>
-  <div id="search-section">
-    <%= form_tag articles_search_path, method: :get, class: "search-form" do %>
-      <%= text_field_tag(
-        :search,
-        params[:search],
-        placeholder: "Search",
-        class: "form-control"
-      ) %>
-      <br>
-    <% end %>
-  </div>
-  <div class="userprofile">
-    <h1 class="userprofile-title">User</h1>
-    <h2 class="userprofile-email"><%= @user.email %></h2>
-    <h2 class="userprofile-savedtimelines-title">My Saved Timelines</h2>
-    <ul class="userprofile-savedtimelines">
-      <% @saved_timelines.each do |timeline| %>
-      <li><a href="/articles/search?utf8=%E2%9C%93&search=<%= timeline.search_string %>&start_time=<%= timeline.start_time %>&end_time=<%= timeline.end_time %>" class="userprofile-savedtimeline"><%= timeline.search_string %></a></li>
-      <% end %>
-    </ul>
-  </div>
-  <div id="keywords-container">
-    <ul id="top-keywords-list"></ul>
-  </div>
-
-  <div id="timeline-nav">
-  </div>
-
-  <div class="content-container">
-    <div id="timeline">
-      <ul id="zone-list">
-      </ul>
-    </div>
-  </div>
-
-  <div id="minimap-container">
-  </div>
-</main>
-
-
-<script id="template-visualization" type="text/x-handlebars-template">
-<li class="visualization-container">
-  <div class="visualization">
-    <div class="hotness">
-      {{hotness}}
-    </div>
-  </div>
-</li>
-</script>
-
-<script id="template-zone" type="text/x-handlebars-template">
-<li class="zone">
-  <div class="aside">
-    <ul class="keywords">
-    </ul>
-    <div class="number-of-articles">
-    </div>
-  </div>
-  <div class="article-summary">
-    <h2 class="article-summary-title">{{title}}</h2>
-    <p class="article-author">{{author}}</p>
-    <p class="article-summary-body">{{lead_paragraph}}</p>
-    <a class="article-web-url" href="{{web_url}}">More</a>
-  </div>
-</li>
-</script>
+<h1 class="userprofile-title">User</h1>
+<h2 class="userprofile-email"><%= @user.email %></h2>
+<h2 class="userprofile-savedtimelines-title">Noodles</h2>
+<ul class="userprofile-savedtimelines">
+  <% @saved_timelines.each do |timeline| %>
+    <li><a href="/" class="userprofile-savedtimeline"><%= timeline.search_string %></a></li>
+  <% end %>
+</ul>
