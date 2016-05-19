@@ -167,38 +167,44 @@ $(document).on('ready page:load', function() {
       var clickedZone = matchedZones[0];
       console.log('CLICKED ZONE: ', clickedZone);
 
-      // Retrieve data for zone corresponding to click event
-      var data = global_data[global_data.length - 1];
-      console.log('DATA: ', data);
+      var activeViewIndex = global_views.length - 1;
+      var data = global_data[activeViewIndex];
       var zoneIndex = data['zones'].length - $(clickedZone).index() - 1;
-      console.log('ZONEINDEX: ', zoneIndex);
       var zone = data['zones'][zoneIndex];
 
-      // Remove timeline from DOM temporarily
-      $('#timeline').detach();
+      console.log('activeViewIndex: ', activeViewIndex);
+      console.log('zoneIndex: ', zoneIndex);
+      console.log('zone: ', zone);
 
-      // Append new DOM element article-list
-      var htmlArticleList = '<ul class="article-list"></ul>';
-      $('.content-container').append(htmlArticleList);
+      if (zone.count >= 20) {
+        console.log('Show sub timeline!');
+      } else {
+        // Remove timeline from DOM temporarily
+        $('#timeline').detach();
 
-      // Add a 'back to timeline' link - the most basic timeline navigation
-      var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
-      $('#timeline-nav').html(htmlBackToTimeline);
+        // Append new DOM element article-list
+        var htmlArticleList = '<ul class="article-list"></ul>';
+        $('.content-container').append(htmlArticleList);
 
-      // Construct each article using the article-summary - reuse template-zone for now
-      var sourceZone = $('#template-zone').html();
-      var templateZone = Handlebars.compile(sourceZone);
+        // Add a 'back to timeline' link - the most basic timeline navigation
+        var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+        $('#timeline-nav').html(htmlBackToTimeline);
 
-      for (var i = 0; i < zone.count; i++) {
-        var htmlArticle = templateZone(zone.article_list[i]);
-        $('.article-list').append(htmlArticle);
+        // Construct each article using the article-summary - reuse template-zone for now
+        var sourceZone = $('#template-zone').html();
+        var templateZone = Handlebars.compile(sourceZone);
 
-        // Append first 3 keywords
-        timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
+        for (var i = 0; i < zone.count; i++) {
+          var htmlArticle = templateZone(zone.article_list[i]);
+          $('.article-list').append(htmlArticle);
+
+          // Append first 3 keywords
+          timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
+        }
+
+        // Show the top of the document instead of the bottom
+        $(document).scrollTop(0);
       }
-
-      // Show the top of the document instead of the bottom
-      $(document).scrollTop(0);
     }
   });
 
