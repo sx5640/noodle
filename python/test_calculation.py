@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 #   Note:   A one line lambda function definition  can be used for very simple
 #           functions, but using "def" always works.
 #   Note:   "*p" unpacks p into its elements; needed for curvefit
-n = 0
+n = 1
 def gauss_fit(x,*p) :
     def degree_n(n):
         return p[4*n]+p[4*n+1]*numpy.exp(-1*(x-p[4*n+2])**2/(2*p[4*n+3]**2))
@@ -45,7 +45,7 @@ for i in range(0, len(y_manipulated)):
 #   http://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html
 # This fits the function "func" to the data points (x, y_data) with y
 #   uncertainties "y_sigma", and initial parameter values p0.
-p, cov = curve_fit(gauss_fit, x, y_data, p0=[1,1,600,100])
+p, cov = curve_fit(gauss_fit, x, y_data, p0=[1,1,80,20,1,1,100,20])
 
 ## Output results
 
