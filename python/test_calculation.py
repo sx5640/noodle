@@ -6,7 +6,7 @@ from scipy.optimize import curve_fit
 #   Note:   A one line lambda function definition  can be used for very simple
 #           functions, but using "def" always works.
 #   Note:   "*p" unpacks p into its elements; needed for curvefit
-n = 1
+n = 0
 def gauss_fit(x,*p) :
     def degree_n(n):
         return p[4*n]+p[4*n+1]*numpy.exp(-1*(x-p[4*n+2])**2/(2*p[4*n+3]**2))
