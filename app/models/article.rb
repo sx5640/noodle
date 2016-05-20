@@ -91,68 +91,76 @@ class Article < ActiveRecord::Base
 
   def self.select_articles_from_database(permitted_params)
     # if timeframe given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword within the timeframe.
-    if permitted_params[:start_time] && permitted_params[:end_time]
-      keyword_search_result = self.joins(:keywords).where("
-        articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ~* ?",
-        permitted_params[:start_time], permitted_params[:end_time],
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+    search_items = permitted_params[:search].split("|")
 
-      title_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND title ~* ?",
-        permitted_params[:start_time], permitted_params[:end_time],
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+    selected_articles = []
 
-      abstract_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND abstract ~* ?",
-        permitted_params[:start_time], permitted_params[:end_time],
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+    search_items.each do |search_item|
+      if permitted_params[:start_time] && permitted_params[:end_time]
+        keyword_search_result = self.joins(:keywords).where("
+          articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ~* ?",
+          permitted_params[:start_time], permitted_params[:end_time],
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      lead_paragraph_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND lead_paragraph ~* ?",
-        permitted_params[:start_time], permitted_params[:end_time],
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+        title_search_result = self.where(
+          "publication_time >= ? AND publication_time <= ? AND title ~* ?",
+          permitted_params[:start_time], permitted_params[:end_time],
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      snippet_search_result = self.where(
-        "publication_time >= ? AND publication_time <= ? AND snippet ~* ?",
-        permitted_params[:start_time], permitted_params[:end_time],
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+        abstract_search_result = self.where(
+          "publication_time >= ? AND publication_time <= ? AND abstract ~* ?",
+          permitted_params[:start_time], permitted_params[:end_time],
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      return keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result
+        lead_paragraph_search_result = self.where(
+          "publication_time >= ? AND publication_time <= ? AND lead_paragraph ~* ?",
+          permitted_params[:start_time], permitted_params[:end_time],
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-    else
-      # if timeframe not given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword from all time
-      keyword_search_result = self.joins(:keywords).where(
-        "keywords.name ~* ?",
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+        snippet_search_result = self.where(
+          "publication_time >= ? AND publication_time <= ? AND snippet ~* ?",
+          permitted_params[:start_time], permitted_params[:end_time],
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      title_search_result = self.where(
-        "title ~* ?",
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+        selected_articles << (keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result)
 
-      abstract_search_result = self.where("
-        abstract ~* ?",
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+      else
+        # if timeframe not given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword from all time
+        keyword_search_result = self.joins(:keywords).where(
+          "keywords.name ~* ?",
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      lead_paragraph_search_result = self.where(
-        "lead_paragraph ~* ?",
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+        title_search_result = self.where(
+          "title ~* ?",
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      snippet_search_result = self.where(
-        "snippet ~* ?",
-        '\W' + "#{permitted_params[:search]}" + '\W'
-      ).order(:publication_time)
+        abstract_search_result = self.where("
+          abstract ~* ?",
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
 
-      return keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result
+        lead_paragraph_search_result = self.where(
+          "lead_paragraph ~* ?",
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
+
+        snippet_search_result = self.where(
+          "snippet ~* ?",
+          '\W' + "#{search_item}" + '\W'
+        ).order(:publication_time)
+
+        selected_articles << (keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result)
+      end
     end
+    return selected_articles.inject(selected_articles[0]) {|result, arr| result & arr }
+
   end
 
   #define a function that cut the selected time period into 20 zones with equal length. the function will return an array of zones, each as a hash, with start_time, end_time, list of articles within the time zone, count of articles within the zone, and 'hotness' of the zone
@@ -248,11 +256,11 @@ class Article < ActiveRecord::Base
       }
       puts(result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
       # output the zones
-      return result
     else
-      # if no article found, nust render the html page
-      return nil
+      result[:search_info] = {
+        search_string: permitted_params[:search]}
     end
+    return result
   end
 
 end
