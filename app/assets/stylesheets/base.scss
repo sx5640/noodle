@@ -252,6 +252,10 @@ main {
 
   overflow: hidden;
 
+  // Hover off
+  transition-property: all;
+  transition-duration: .5s;
+
   .aside {
     @include span-columns(4);
     padding-top: .67rem;
@@ -301,8 +305,12 @@ main {
   }
 }
 
+// Hover on
+
 .zone:hover {
   color: #00c8ff;
+  transition-property: all;
+  transition-duration: .5s;
 }
 
 .top-keywords-zone {
