@@ -37,7 +37,7 @@ class Article < ActiveRecord::Base
           # now keywords
           entry['keywords'].each do |keyword|
             # this is to avoid brackets like Tesla (cooperation)
-            keyword_temp = keyword['value'].split(' (')
+            keyword_temp = keyword['value'].titleize.split(' (')
             keyword['value'] = keyword_temp[0]
             # this is to reformat names from Musk, Elon to Elon Musk
             if keyword['value'] && keyword['name'] == 'persons'
@@ -52,17 +52,23 @@ class Article < ActiveRecord::Base
               new_keyword_analysis = article.keyword_analyses.new
               new_keyword_analysis.keyword = existing_keyword
               # calculate relevance based on the ranking of the keyword given by NYTimes
-              new_keyword_analysis[:relevance] = 0.5 + (0.5 / keyword['rank'].to_f)
-              # save
-              new_keyword_analysis.save
+              if keyword['rank']
+                new_keyword_analysis[:relevance] = 0.5 + (0.5 / keyword['rank'].to_f)
+              else
+                new_keyword_analysis[:relevance] = 0.5
+              end
             else
               # otherwise, create a new_keyword, then create a new_keyword_analysis that connect it with the current article
               new_keyword = Keyword.create(name: keyword['value'], keyword_type: keyword['name'])
               new_keyword_analysis = article.keyword_analyses.new
               new_keyword_analysis.keyword = new_keyword
-              new_keyword_analysis[:relevance] = 0.5 + (0.5 / keyword['rank'].to_f)
-              new_keyword_analysis.save
+              if keyword['rank']
+                new_keyword_analysis[:relevance] = 0.5 + (0.5 / keyword['rank'].to_f)
+              else
+                new_keyword_analysis[:relevance] = 0.5
+              end
             end
+            new_keyword_analysis.save
           end
         end
       end
@@ -82,6 +88,7 @@ class Article < ActiveRecord::Base
     end_time_cycle = Date.strptime(end_date.to_s,'%Y%m%d')
     start_time_cycle = end_time_cycle - step
     while start_time_cycle.strftime('%Y%m%d').to_i > begin_date
+      puts "#{search_terms}"
       puts "#{start_time_cycle} To #{end_time_cycle}"
       articles = Article.get_nytimes_articles(search_terms, start_time_cycle.strftime('%Y%m%d'), end_time_cycle.strftime('%Y%m%d'))
       end_time_cycle -= (step + 1.day)
@@ -100,31 +107,31 @@ class Article < ActiveRecord::Base
         keyword_search_result = self.joins(:keywords).where("
           articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ~* ?",
           permitted_params[:start_time], permitted_params[:end_time],
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         title_search_result = self.where(
           "publication_time >= ? AND publication_time <= ? AND title ~* ?",
           permitted_params[:start_time], permitted_params[:end_time],
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         abstract_search_result = self.where(
           "publication_time >= ? AND publication_time <= ? AND abstract ~* ?",
           permitted_params[:start_time], permitted_params[:end_time],
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         lead_paragraph_search_result = self.where(
           "publication_time >= ? AND publication_time <= ? AND lead_paragraph ~* ?",
           permitted_params[:start_time], permitted_params[:end_time],
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         snippet_search_result = self.where(
           "publication_time >= ? AND publication_time <= ? AND snippet ~* ?",
           permitted_params[:start_time], permitted_params[:end_time],
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         selected_articles << (keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result)
@@ -133,27 +140,27 @@ class Article < ActiveRecord::Base
         # if timeframe not given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword from all time
         keyword_search_result = self.joins(:keywords).where(
           "keywords.name ~* ?",
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         title_search_result = self.where(
           "title ~* ?",
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         abstract_search_result = self.where("
           abstract ~* ?",
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         lead_paragraph_search_result = self.where(
           "lead_paragraph ~* ?",
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         snippet_search_result = self.where(
           "snippet ~* ?",
-          '\W' + "#{search_item}" + '\W'
+          '\y' + "#{search_item}" + '\y'
         ).order(:publication_time)
 
         selected_articles << (keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result)

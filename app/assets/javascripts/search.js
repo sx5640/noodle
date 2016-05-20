@@ -175,13 +175,12 @@ $(document).on('ready page:load', function() {
   function clickKeyword(eventObject) {
     eventObject.preventDefault();
 
-    newSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text())
+    newSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text());
+    var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+    $('#timeline-nav').html(htmlBackToTimeline);
   }
 
-  $('#top-keywords-list').on('click', function(eventObject) {
-    console.log("I'm here");
-    clickKeyword(eventObject)
-  })
+  $('#top-keywords-list').on('click', clickKeyword)
   // Click event handler to change views when a user clicks on a zone
   // If the number of articles in the zone is < 20, an articles view will be displayed
   // Otherwise, another timeline will be displayed, the data for that timeline will be via an ajax call
