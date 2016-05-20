@@ -16,6 +16,11 @@ $(document).on('ready page:load', function() {
       type: 'GET',
       dataType: 'json',
       success: function(data) {
+        // Clear the view stack and corresponding data stack, and clear any timeline navigation still present
+        global_views = [];
+        global_data = [];
+        $('#timeline-nav').empty();
+
         // Build timeline, display it and push it onto stack along with its data
         pushTimelineView(data);
 
@@ -45,8 +50,8 @@ $(document).on('ready page:load', function() {
 
       var firstNonEmptyZoneDisplayed = false;
 
-      // Remove timeline from DOM temporarily
-      $('#timeline').detach();
+      // Remove currently displayed timeline from DOM so we can attach the new timeline view
+      $('#timeline').remove();
 
       var htmlTimeline = '<div id="timeline"><ul id="zone-list"></ul></div>';
       var root = $('.content-container').html(htmlTimeline);
