@@ -237,7 +237,7 @@ $(document).on('ready page:load', function() {
         ////
 
         // Remove timeline from DOM temporarily
-        $('#timeline').detach();
+        $('#timeline').remove();
 
         // Append new DOM element article-list
         var htmlArticleList = '<ul class="article-list"></ul>';
@@ -259,16 +259,25 @@ $(document).on('ready page:load', function() {
           timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
         }
 
+        // Push articles view onto view stack
         global_views.push($('.article-list'));
         global_data.push('');
 
+        // Render empty mimimap
         minimap.render(null);
 
-        // Show the top of the document instead of the bottom
-        $(document).scrollTop(0);
+        // Scroll the document to the start of content
+        scrollToContentContainerTop();
       }
     }
   });
+
+  function scrollToContentContainerTop() {
+      var documentHeight = $(document).height();
+      var articleListHeight = $('.content-container').outerHeight();
+      var headerHeight = documentHeight - articleListHeight + 60;
+      $(document).scrollTop(headerHeight);
+  }
 
   // Add event handler to go back to timeline via AJAX
   $('#timeline-nav').on('click', function(eventObject) {
