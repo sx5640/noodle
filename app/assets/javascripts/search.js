@@ -5,11 +5,11 @@ $(document).on('ready page:load', function() {
 
   // AJAX call to submit search terms and display the article results
   var newSearch = function(search_string, start_time, end_time) {
-    searchFunction(search_string, start_time, end_time, false)
+    searchFunction(search_string, start_time, end_time, false);
   }
 
   var subSearch = function(search_string, start_time, end_time) {
-    searchFunction(search_string, start_time, end_time, true)
+    searchFunction(search_string, start_time, end_time, true);
   }
 
   var searchFunction = function (search_string, start_time, end_time, is_sub_search) {
@@ -48,12 +48,12 @@ $(document).on('ready page:load', function() {
   presetData = $('#search-section').data()
   if (presetData && presetData.searchString) {
     newSearch(presetData.searchString, presetData.startTime, presetData.endTime)
-  }
+  };
 
   // Submit search terms and send AJAX call
   $('.search-form').on('submit', function(eventObject) {
     eventObject.preventDefault();
-    newSearch($('.search-form #search').val())
+    newSearch($('.search-form #search').val());
   });
 
   function pushTimelineView(data) {
@@ -196,7 +196,7 @@ $(document).on('ready page:load', function() {
     subSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text());
   }
 
-  $('#top-keywords-list').on('click', clickKeyword)
+  $('#top-keywords-list').on('click', clickKeyword);
   // Click event handler to change views when a user clicks on a zone
   // If the number of articles in the zone is < 20, an articles view will be displayed
   // Otherwise, another timeline will be displayed, the data for that timeline will be via an ajax call
@@ -237,7 +237,7 @@ $(document).on('ready page:load', function() {
             // Add a 'back to timeline' link - the most basic timeline navigation
             var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
             $('#timeline-nav').html(htmlBackToTimeline);
-          }
+          };
         });
 
       } else {
