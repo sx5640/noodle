@@ -109,14 +109,24 @@ main {
 }
 
 .container {
-  // @include outer-container;
-  // overflow: hidden;
-}
-
-.container {
   @include outer-container;
   overflow: hidden;
   max-width: 1152px;
+}
+
+#logo {
+  display: block;
+  margin: 0 auto;
+  max-width: 160px;
+}
+
+h1.search-title {
+  color: black;
+  font-size: .75rem;
+  font-weight: 200;
+  text-transform: uppercase;
+  text-align: center;
+  margin: 0;
 }
 
 #search-section {
@@ -252,6 +262,10 @@ main {
 
   overflow: hidden;
 
+  // Hover off
+  transition-property: all;
+  transition-duration: .5s;
+
   .aside {
     @include span-columns(4);
     padding-top: .67rem;
@@ -301,8 +315,12 @@ main {
   }
 }
 
+// Hover on
+
 .zone:hover {
   color: #00c8ff;
+  transition-property: all;
+  transition-duration: .5s;
 }
 
 .top-keywords-zone {

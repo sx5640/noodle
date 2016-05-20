@@ -16,6 +16,11 @@ $(document).on('ready page:load', function() {
       type: 'GET',
       dataType: 'json',
       success: function(data) {
+        // Clear the view stack and corresponding data stack, and clear any timeline navigation still present
+        global_views = [];
+        global_data = [];
+        $('#timeline-nav').empty();
+
         // Build timeline, display it and push it onto stack along with its data
         pushTimelineView(data);
 
@@ -45,8 +50,8 @@ $(document).on('ready page:load', function() {
 
       var firstNonEmptyZoneDisplayed = false;
 
-      // Remove timeline from DOM temporarily
-      $('#timeline').detach();
+      // Remove currently displayed timeline from DOM so we can attach the new timeline view
+      $('#timeline').remove();
 
       var htmlTimeline = '<div id="timeline"><ul id="zone-list"></ul></div>';
       var root = $('.content-container').html(htmlTimeline);
@@ -231,7 +236,7 @@ $(document).on('ready page:load', function() {
         ////
 
         // Remove timeline from DOM temporarily
-        $('#timeline').detach();
+        $('#timeline').remove();
 
         // Append new DOM element article-list
         var htmlArticleList = '<ul class="article-list"></ul>';
@@ -253,16 +258,25 @@ $(document).on('ready page:load', function() {
           timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
         }
 
+        // Push articles view onto view stack
         global_views.push($('.article-list'));
         global_data.push('');
 
+        // Render empty mimimap
         minimap.render(null);
 
-        // Show the top of the document instead of the bottom
-        $(document).scrollTop(0);
+        // Scroll the document to the start of content
+        scrollToContentContainerTop();
       }
     }
   });
+
+  function scrollToContentContainerTop() {
+      var documentHeight = $(document).height();
+      var articleListHeight = $('.content-container').outerHeight();
+      var headerHeight = documentHeight - articleListHeight + 60;
+      $(document).scrollTop(headerHeight);
+  }
 
   // Add event handler to go back to timeline via AJAX
   $('#timeline-nav').on('click', function(eventObject) {
