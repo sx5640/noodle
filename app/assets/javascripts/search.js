@@ -12,7 +12,7 @@ $(document).on('ready page:load', function() {
     searchFunction(search_string, start_time, end_time, true);
   };
 
-  var searchFunction = function (search_string, start_time, end_time, is_sub_search) {
+  var searchFunction = function(search_string, start_time, end_time, is_sub_search) {
     if (start_time && end_time) {
       var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string + '&start_time=' + start_time + '&end_time=' + end_time;
     }
@@ -45,7 +45,8 @@ $(document).on('ready page:load', function() {
   }
 
   // If there are data in the data attribute, do an automatic search
-  presetData = $('#search-section').data()
+  presetData = $('#search-section').data();
+
   if (presetData && presetData.searchString) {
     newSearch(presetData.searchString, presetData.startTime, presetData.endTime);
   }
@@ -53,7 +54,7 @@ $(document).on('ready page:load', function() {
   // Submit search terms and send AJAX call
   $('.search-form').on('submit', function(eventObject) {
     eventObject.preventDefault();
-    newSearch($('.search-form #search').val());
+    newSearch( $('.search-form #search').val() );
   });
 
   function pushTimelineView(data) {
@@ -116,6 +117,7 @@ $(document).on('ready page:load', function() {
         console.log(data['zones'][i]);
 
         var zone = data['zones'][i];
+
         if (zone !== null) {
           if (zone.count > 0) {
             var htmlVisualization = templateVisualization(zone);
@@ -137,11 +139,13 @@ $(document).on('ready page:load', function() {
 
             // Display number of articles
             var htmlNumberOfArticles = zone.article_list.length;
+
             if (zone.article_list.length === 0 || zone.article_list.length > 1) {
               htmlNumberOfArticles += ' stories';
             } else {
               htmlNumberOfArticles += ' story';
             }
+            
             $('.number-of-articles').last().html(htmlNumberOfArticles);
 
             // Display zone hotness visualization (circle)
