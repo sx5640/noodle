@@ -6,15 +6,15 @@ $(document).on('ready page:load', function() {
   // AJAX call to submit search terms and display the article results
   var newSearch = function(search_string, start_time, end_time) {
     searchFunction(search_string, start_time, end_time, false);
-  }
+  };
 
   var subSearch = function(search_string, start_time, end_time) {
     searchFunction(search_string, start_time, end_time, true);
-  }
+  };
 
   var searchFunction = function (search_string, start_time, end_time, is_sub_search) {
     if (start_time && end_time) {
-      var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string + '&start_time=' + start_time + '&end_time=' + end_time
+      var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string + '&start_time=' + start_time + '&end_time=' + end_time;
     }
     else {
       var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string;
@@ -47,8 +47,8 @@ $(document).on('ready page:load', function() {
   // If there are data in the data attribute, do an automatic search
   presetData = $('#search-section').data()
   if (presetData && presetData.searchString) {
-    newSearch(presetData.searchString, presetData.startTime, presetData.endTime)
-  };
+    newSearch(presetData.searchString, presetData.startTime, presetData.endTime);
+  }
 
   // Submit search terms and send AJAX call
   $('.search-form').on('submit', function(eventObject) {
@@ -237,7 +237,7 @@ $(document).on('ready page:load', function() {
             // Add a 'back to timeline' link - the most basic timeline navigation
             var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
             $('#timeline-nav').html(htmlBackToTimeline);
-          };
+          }
         });
 
       } else {
@@ -350,12 +350,12 @@ $(document).on('ready page:load', function() {
       $('.minimap-circle-hover').removeClass('minimap-circle-hover');
       $(source).toggleClass('minimap-circle-hover');
     }
-  })
+  });
 
   $('#minimap-container').on('mouseout', function(eventObject) {
     $('.minimap-circle-hover').removeClass('minimap-circle-hover');
     updateMinimap();
-  })
+  });
 
   $('#minimap-container').on('click', function(eventObject) {
     var offset = $(this).offset();
@@ -373,5 +373,5 @@ $(document).on('ready page:load', function() {
 
     $(document).scrollTop(newY);
     // $(document).animate({ scrollTop:newY }, 'slow');
-  })
+  });
 });
