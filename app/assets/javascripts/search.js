@@ -5,6 +5,14 @@ $(document).on('ready page:load', function() {
 
   // AJAX call to submit search terms and display the article results
   var newSearch = function(search_string, start_time, end_time) {
+    searchFunction(search_string, start_time, end_time, false)
+  }
+
+  var subSearch = function(search_string, start_time, end_time) {
+    searchFunction(search_string, start_time, end_time, true)
+  }
+
+  var searchFunction = function (search_string, start_time, end_time, is_sub_search) {
     if (start_time && end_time) {
       var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string + '&start_time=' + start_time + '&end_time=' + end_time
     }
@@ -17,9 +25,14 @@ $(document).on('ready page:load', function() {
       dataType: 'json',
       success: function(data) {
         // Clear the view stack and corresponding data stack, and clear any timeline navigation still present
-        global_views = [];
-        global_data = [];
-        $('#timeline-nav').empty();
+        if (is_sub_search) {
+          var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+          $('#timeline-nav').html(htmlBackToTimeline);
+        } else {
+          global_views = [];
+          global_data = [];
+          $('#timeline-nav').empty();
+        }
 
         // Build timeline, display it and push it onto stack along with its data
         pushTimelineView(data);
@@ -180,9 +193,7 @@ $(document).on('ready page:load', function() {
   function clickKeyword(eventObject) {
     eventObject.preventDefault();
 
-    newSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text());
-    var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
-    $('#timeline-nav').html(htmlBackToTimeline);
+    subSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text());
   }
 
   $('#top-keywords-list').on('click', clickKeyword)

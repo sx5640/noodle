@@ -101,7 +101,7 @@ class Article < ActiveRecord::Base
     search_items = permitted_params[:search].split("|")
 
     selected_articles = []
-
+    # search in database with keywords.the \y regex means word boundary
     search_items.each do |search_item|
       if permitted_params[:start_time] && permitted_params[:end_time]
         keyword_search_result = self.joins(:keywords).where("
