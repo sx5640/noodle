@@ -1,10 +1,13 @@
 <main>
-  <div id="search-section">
+  <%= tag("div", id: "search-section", data: params) %>
+
+    <h1 class="search-title">Search</h1>
+
     <%= form_tag articles_search_path, method: :get, class: "search-form" do %>
       <%= text_field_tag(
           :search,
           params[:search],
-          placeholder: "Search",
+          # placeholder: "search",
           class: "form-control"
       ) %>
       <br>
@@ -19,10 +22,9 @@
   </div>
 
   <div class="content-container">
-    <div id="timeline">
-      <ul id="zone-list">
-      </ul>
-    </div>
+  </div>
+
+  <div id="minimap-container">
   </div>
 </main>
 

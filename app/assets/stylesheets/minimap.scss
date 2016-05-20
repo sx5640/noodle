@@ -1,0 +1,40 @@
+#minimap-container {
+  float: right;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  width: 100px;
+  height: 0px;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  background-color: #00c8ff;
+
+  transition-property: all;
+  transition-duration: .25s;
+  transform: scale(1);
+  z-index: 0;
+
+  &.minimap-circle-pop {
+    background-color: white;
+    border: .5px solid #00c8ff;
+    // border: .5px solid #e20090;
+
+    transition-property: all;
+    transition-duration: .5s;
+    transform: scale(3);
+    z-index: 1;
+  }
+
+  &.minimap-circle-hover {
+    background-color: #00c8ff;
+    // border: .5px solid #e20090;
+
+    transition-property: all;
+    transition-duration: .5s;
+    transform: scale(2);
+    z-index: 1;
+  }
+}

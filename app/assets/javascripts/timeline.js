@@ -6,7 +6,9 @@ var timeline = (function() {
     // and appends the first 'numKeywords' keywords to the jQuery object 'jQuerySelector', which should select
     // an existing DOM element in the active document,
     // and styles each appended keyword's fontWeight based on its relevance value
-    replaceKeywords: function(keywordsArray, numKeywords, jQuerySelector, className, relevanceScaleFactor = 1.0) {
+    replaceKeywords: function(keywordsArray, numKeywords, jQuerySelector, className, relevanceScaleFactor) {
+      relevanceScaleFactor = relevanceScaleFactor || 1.0;
+
       if (keywordsArray !== null) {
 
         var htmlKeyword;

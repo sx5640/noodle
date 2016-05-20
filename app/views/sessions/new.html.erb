@@ -1,18 +1,20 @@
-<h1>Sessions#new</h1>
-<%= form_tag sessions_create_path do %>
-  <div class="field">
-    <%= label_tag :email %><br />
-    <%= text_field_tag :email %>
-  </div>
-  <div class="field">
-    <%= label_tag :password %><br />
-    <%= password_field_tag :password %>
-  </div>
-  <div class="check_box">
-    <%= check_box_tag :remember, params[:remember], true %>
-    <%= label_tag "Remember me for 7 days" %>
-  </div>
-  <div class="actions">
-    <%= submit_tag "Login" %>
-  </div>
-<% end %>
+<div id="login-container">
+  <h1 class="login-title">Login</h1>
+  <%= form_tag sessions_create_path do %>
+    <div class="field">
+      <%= label_tag :email %>
+      <%= text_field_tag :email %>
+    </div>
+    <div class="field">
+      <%= label_tag :password %>
+      <%= password_field_tag :password %>
+    </div>
+    <div class="check_box">
+      <%= check_box_tag :remember, params[:remember], true %>
+      <%= label_tag "Remember me for 7 days" %>
+    </div>
+    <div class="actions">
+      <%= submit_tag "Login" %>
+    </div>
+  <% end %>
+</div>
