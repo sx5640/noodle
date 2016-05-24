@@ -36,8 +36,8 @@ gem 'sdoc', '~> 0.4.0', group: :doc
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
-# Use HTTParty for getting articles from NYTimes
-gem "httparty"
+# Use typhoeus for sending http resqusts
+gem "typhoeus"
 
 # Use Sorcery for user model
 gem "sorcery"
