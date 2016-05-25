@@ -20,10 +20,10 @@ Rails.application.configure do
   config.active_support.deprecation = :log
 
   # disable logger
-  config.after_initialize do
-    ActiveRecord::Base.logger = Rails.logger.clone
-    ActiveRecord::Base.logger.level = Logger::INFO
-  end
+  # config.after_initialize do
+  #   ActiveRecord::Base.logger = Rails.logger.clone
+  #   ActiveRecord::Base.logger.level = Logger::INFO
+  # end
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 

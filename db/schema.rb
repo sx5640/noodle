@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160517184843) do
+ActiveRecord::Schema.define(version: 20160525182815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -36,6 +36,12 @@ ActiveRecord::Schema.define(version: 20160517184843) do
     t.integer  "word_count"
   end
 
+  add_index "articles", ["abstract"], name: "index_articles_on_abstract", using: :btree
+  add_index "articles", ["lead_paragraph"], name: "index_articles_on_lead_paragraph", using: :btree
+  add_index "articles", ["publication_time"], name: "index_articles_on_publication_time", using: :btree
+  add_index "articles", ["snippet"], name: "index_articles_on_snippet", using: :btree
+  add_index "articles", ["title"], name: "index_articles_on_title", using: :btree
+
   create_table "keyword_analyses", force: :cascade do |t|
     t.integer  "article_id"
     t.integer  "keyword_id"
@@ -44,12 +50,17 @@ ActiveRecord::Schema.define(version: 20160517184843) do
     t.datetime "updated_at", null: false
   end
 
+  add_index "keyword_analyses", ["article_id"], name: "index_keyword_analyses_on_article_id", using: :btree
+  add_index "keyword_analyses", ["keyword_id"], name: "index_keyword_analyses_on_keyword_id", using: :btree
+
   create_table "keywords", force: :cascade do |t|
     t.string   "name"
     t.datetime "created_at",   null: false
     t.datetime "updated_at",   null: false
     t.string   "keyword_type"
   end
+
+  add_index "keywords", ["name"], name: "index_keywords_on_name", using: :btree
 
   create_table "saved_timeline_notes", force: :cascade do |t|
     t.text     "text"

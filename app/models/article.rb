@@ -3,6 +3,31 @@ class Article < ActiveRecord::Base
   has_many :keywords, through: :keyword_analyses
   has_many :saved_timelines
   # defining a method dedicated to get articles from NYTimes
+  def self.create_articles(entry)
+      # select data from each article where the JSON attributes has the same name with out Article class object.
+      # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
+    unless self.find_by(web_url: entry['web_url'])
+      data = entry.select {|k,v| self.new.attributes.keys.include?(k)}
+      article = self.new(data)
+      # clean up the title
+      article[:title] = entry['headline']['main']
+      # clean up author
+      if entry['byline'] && !entry['byline'].empty?
+        article[:author] = entry['byline']['original']
+      end
+      # get the first multimedia from the list of media
+      article[:media_url] = entry['multimedia'].first['url'] unless entry['multimedia'].empty?
+      # set publication datetime
+      article[:publication_time] = entry['pub_date'].to_datetime
+      # save int database
+      article.save
+
+      # now keywords
+      Keyword.get_watson_keywords(article)
+      # Keyword.get_nytimes_keywords(entry, article)
+    end
+  end
+
   def self.get_nytimes_articles(search_terms, begin_date, end_date)
     articles = []
     search_terms = search_terms.split(" ").join("%20")
@@ -18,31 +43,25 @@ class Article < ActiveRecord::Base
       else
         # iterate through the 10 articles get from each call, and clean up the data
         articles << response["response"]["docs"]
-        threads = []
-        response["response"]["docs"].each do |entry|
-            # select data from each article where the JSON attributes has the same name with out Article class object.
-            # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
-          unless self.find_by(web_url: entry['web_url'])
-            data = entry.select {|k,v| self.new.attributes.keys.include?(k)}
-            article = self.new(data)
-            # clean up the title
-            article[:title] = entry['headline']['main']
-            # clean up author
-            if entry['byline'] && !entry['byline'].empty?
-              article[:author] = entry['byline']['original']
-            end
-            # get the first multimedia from the list of media
-            article[:media_url] = entry['multimedia'].first['url'] unless entry['multimedia'].empty?
-            # set publication datetime
-            article[:publication_time] = entry['pub_date'].to_datetime
-            # save int database
-            article.save
 
-            # now keywords
-            Keyword.get_watson_keywords(article)
-            # Keyword.get_nytimes_keywords(entry, article)
+
+        # response["response"]["docs"].each do |entry|
+        threads = []
+        num_of_threads = 4
+        num_of_threads.times do |t|
+          threads[t] = Thread.new do
+            if response["response"]["docs"][t]
+              self.create_articles(response["response"]["docs"][t])
+              if response["response"]["docs"][t+4]
+                self.create_articles(response["response"]["docs"][t+4])
+                if response["response"]["docs"][t+8]
+                  self.create_articles(response["response"]["docs"][t+8])
+                end
+              end
+            end
           end
         end
+        threads.each {|t| t.join}
       end
     end
     return articles
