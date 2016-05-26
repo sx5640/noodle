@@ -218,15 +218,13 @@ class Article < ActiveRecord::Base
     # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
     keywords_collection = {}
     articles.each do |article|
-      article.keywords.each do |keyword|
+      article.keyword_analyses.each do |keyword_analysis|
         # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
-        corresponding_keyword_analysis = KeywordAnalysis.where("article_id = ? AND keyword_id = ?", article, keyword)
-        unless corresponding_keyword_analysis.empty?
-          if keywords_collection.keys.include?(keyword.name)
-            keywords_collection["#{keyword.name}"] += corresponding_keyword_analysis.first.relevance
-          else
-            keywords_collection["#{keyword.name}"] = corresponding_keyword_analysis.first.relevance
-          end
+        keyword = keyword_analysis.keyword
+        if keywords_collection.keys.include?(keyword.name)
+          keywords_collection["#{keyword.name}"] += keyword_analysis.relevance
+        else
+          keywords_collection["#{keyword.name}"] = keyword_analysis.relevance
         end
       end
     end
@@ -267,6 +265,8 @@ class Article < ActiveRecord::Base
 
     begin_date = articles.last.publication_time
     end_date = articles.first.publication_time
+    puts(begin_date)
+    puts(end_date)
 
     i = 0
     if File.exist?('python/data.txt')
