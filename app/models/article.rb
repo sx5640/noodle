@@ -269,17 +269,17 @@ class Article < ActiveRecord::Base
     puts(end_date)
 
     i = 0
-    if File.exist?('python/data.txt')
-      File.delete('python/data.txt')
+    if File.exist?("python/#{permitted_params[:search]}.txt")
+      File.delete("python/#{permitted_params[:search]}.txt")
     end
-    File.new('python/data.txt', "w+")
+    File.new("python/#{permitted_params[:search]}.txt", "w+")
     sum = 0
     while begin_date + i.day <= end_date
       article_in_month = articles.select { |article|
       article.publication_time >= begin_date + i.day &&
       article.publication_time < begin_date + (i+1).day}
       write_in = "#{sprintf("%03d", i)}    #{sprintf("%03d", article_in_month.length)}\n"
-      open('python/data.txt', 'a') { |f|
+      open("python/#{permitted_params[:search]}.txt", 'a') { |f|
         f.puts write_in
       }
       i += 1
