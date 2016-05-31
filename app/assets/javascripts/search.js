@@ -87,7 +87,7 @@ $(document).on('ready page:load', function() {
   //
   // Trigger an AJAX call to get another timeline, or display articles list (< 20 articles in zone)
   //
-  $('.content-container').on('click', function(eventObject) {
+  $('#content-container').on('click', function(eventObject) {
 
     var matchedZones = $(eventObject.target).closest('.zone');
 
@@ -138,7 +138,7 @@ $(document).on('ready page:load', function() {
 
         // Append new DOM element article-list
         var htmlArticleList = '<ul class="article-list"></ul>';
-        $('.content-container').append(htmlArticleList);
+        $('#content-container').append(htmlArticleList);
 
         // Add a 'back to timeline' link - the most basic timeline navigation
         var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
@@ -165,7 +165,7 @@ $(document).on('ready page:load', function() {
 
         // Scroll the document to the start of content
         var documentHeight = $(document).height();
-        var articleListHeight = $('.content-container').outerHeight();
+        var articleListHeight = $('#content-container').outerHeight();
         var headerHeight = documentHeight - articleListHeight + 60;
         $(document).scrollTop(headerHeight);
       }
@@ -179,14 +179,14 @@ $(document).on('ready page:load', function() {
     eventObject.preventDefault();
 
     // Remove current view
-    $('.content-container').empty();
+    $('#content-container').empty();
 
     // Pop the saved dom tree for current view
     global_views.pop();
     global_data.pop();
 
     // Add the previous view (now the last view in the view stack) to the live dom, displaying it
-    $('.content-container').html(global_views[global_views.length - 1]);
+    $('#content-container').html(global_views[global_views.length - 1]);
 
     // Re-render the minimap to reflect the current timeline view
     minimap.render(global_data[global_data.length - 1]['zones']);
@@ -254,7 +254,7 @@ $(document).on('ready page:load', function() {
       $('#timeline').remove();
 
       var htmlTimeline = '<div id="timeline"><ul id="zone-list"></ul></div>';
-      var root = $('.content-container').html(htmlTimeline);
+      var root = $('#content-container').html(htmlTimeline);
 
       // Display Keywords for entire timeline
       timeline.replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
@@ -378,7 +378,7 @@ $(document).on('ready page:load', function() {
       global_data.push(data);
     }
   }
-  
+
   //
   // View: udpate the minimap to reflect the latest scroll position
   //
