@@ -18,8 +18,6 @@ var minimap = (function() {
         var topOffset = distance / 2;
 
         for ( var i = zones.length - 1; i >= 0 ; i-- ) {
-          console.log(zones[i].count);
-
           var zone = zones[i];
 
           if (zone.count > 0) {
@@ -47,7 +45,6 @@ var minimap = (function() {
           result++;
         }
       }
-      console.log('result ', result);
       return result;
     }
   }

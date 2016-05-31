@@ -7,6 +7,11 @@ $(document).on('ready page:load', function() {
   var global_data  = [];
 
   //
+  // Initialize Three.js
+  //
+  visualization.init();
+
+  //
   // Get saved timeline, populated by the user profile
   //
   var savedTimeline = $('#search-section').data();
