@@ -5,9 +5,14 @@ var visualization = (function() {
   var scene;
   var camera;
   var renderer;
-  var meshes;
-  var geometry;
-  var material;
+  var boxMeshes;
+  // var boxGeometry;
+  // var boxMaterial;
+  var groundPlane;
+  var groundPlaneGeometry;
+  var groundPlaneMaterial;
+  var ambientLight;
+  var directionalLight;
 
   return {
 
@@ -21,24 +26,59 @@ var visualization = (function() {
 
       // Initialize Three.js
       scene = new THREE.Scene();
-      camera = new THREE.PerspectiveCamera( 35, width/height, 0.1, 1000 );
+      camera = new THREE.PerspectiveCamera( 30, width/height, 1, 100000 );
       renderer = new THREE.WebGLRenderer( { alpha: true, antialias: true } );
-      renderer.setClearColor( 0xffffff, 0 );
+      // renderer.setClearColor( 0xffffff, 0 );
       renderer.setSize( width, height );
+      renderer.shadowMapEnabled = true;
+      renderer.shadowMapSoft = true;
+
+      // Set camera's z position
+      camera.position.z = 2500;
+      camera.position.y = 1500;
+      camera.rotation.x = -.35;
+
+      // Create ground plane
+      var groundMaterial = new THREE.MeshPhongMaterial({
+        color: 0xffffff
+      });
+      groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(5000, 5000), groundMaterial);
+      groundPlane.rotation.x = -Math.PI / 2;
+      groundPlane.receiveShadow = true
+      scene.add(groundPlane);
+
+      // Create lights
+      ambientLight = new THREE.AmbientLight( 0x5f5f5f );
+      scene.add(ambientLight);
+
+      directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
+      directionalLight.position.set(500, 1000, 250);
+      directionalLight.position.multiplyScalar(1.3);
+
+      directionalLight.castShadow = true;
+      directionalLight.shadowCameraVisible = true;
+
+      directionalLight.shadowMapWidth = 2048;
+      directionalLight.shadowMapHeight = 2048;
+
+      var d = 2000;
+
+      directionalLight.shadowCameraLeft = -d;
+      directionalLight.shadowCameraRight = d;
+      directionalLight.shadowCameraTop = d;
+      directionalLight.shadowCameraBottom = -d;
+
+      directionalLight.shadowCameraFar = 10000;
+      directionalLight.shadowDarkness = 0.2;
+      scene.add(directionalLight);
 
       // Attach Three.js canvas to container element
       $( '#visualization-container' ).empty();
       $( '#visualization-container' ).append( renderer.domElement );
 
-      // Set camera's z position
-      camera.position.z = 15;
-      camera.position.y = 7;
-      camera.rotation.x = -.2;
-
       // Define render callback animation function and pass it to requestAnimationFrame()
       var render = function () {
         requestAnimationFrame( render );
-
         renderer.render( scene, camera );
       };
 
@@ -55,29 +95,28 @@ var visualization = (function() {
       for (let i = scene.children.length - 1; i >= 0 ; i--) {
         let child = scene.children[ i ];
 
-        if ( child !== camera ) { // camera is stored earlier
+        if ( child !== camera && child !== groundPlane && child !== ambientLight && child !== directionalLight ) {
           scene.remove(child);
         }
       }
 
       // Create an array of Meshes that represent the zones
-      meshes = [];
-      geometry = new THREE.BoxGeometry( 1, 1, 1 );
-      material = new THREE.MeshBasicMaterial( { color: 0x00c8ff } );
+      boxMeshes = [];
 
       // Create one cube object for each zone (even empty zones) and add them to the scene
       var numZones = zones.length;
       for (var i = 0; i < numZones; i++) {
-        var cube = new THREE.Mesh( geometry, material );
-        var spacing = 1.8;
+        var spacing = 150;
         var zone = zones[i];
-        var verticalScale = 0.1 + zone.count / 6;
-        // var horizontalScale = 1 / (1 + Math.abs(numZones/2 - i));
-        cube.scale.setX(0.2);
-        cube.scale.setY(verticalScale);
-        // cube.scale.setZ(horizontalScale);
-        cube.scale.setZ(0.2);
+        var verticalScale = 0.1 + zone.count * 25;
+        var boxGeometry = new THREE.BoxGeometry( 100, verticalScale, 300 );
+        var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
+        var cube = new THREE.Mesh( boxGeometry, boxMaterial );
+        cube.castShadow = true;
+        cube.receiveShadow = true;
+        cube.scale.setX(0.033);
         cube.position.set( (numZones/2 - i) * spacing, verticalScale/2, 0 );
+        boxMeshes.push(cube); // Stash box for later use
         scene.add( cube );
       }
     }
