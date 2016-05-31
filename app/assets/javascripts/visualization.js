@@ -106,16 +106,16 @@ var visualization = (function() {
       // Create one cube object for each zone (even empty zones) and add them to the scene
       var numZones = zones.length;
       for (var i = 0; i < numZones; i++) {
-        var spacing = 150;
+        var spacing = 250;
         var zone = zones[i];
-        var verticalScale = 0.1 + zone.count * 25;
-        var boxGeometry = new THREE.BoxGeometry( 100, verticalScale, 300 );
+        var verticalSize = 10 + zone.count * 25;
+        var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
         var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
         var cube = new THREE.Mesh( boxGeometry, boxMaterial );
         cube.castShadow = true;
         cube.receiveShadow = true;
         cube.scale.setX(0.033);
-        cube.position.set( (numZones/2 - i) * spacing, verticalScale/2, 0 );
+        cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
         boxMeshes.push(cube); // Stash box for later use
         scene.add( cube );
       }
