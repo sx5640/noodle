@@ -21,34 +21,32 @@ def find_top(data):
 
         zones.append({'start_time': start_time, 'end_time': end_time, 'top_value': top_value})
 
-        print zones
-
         for i in range(start_time, end_time + 1):
             data_not_zoned[i] = 'stop'
             data_temp[i] = 0
 
         find_top(data_temp)
 
-    # else:
-    #     i = 0
-    #     while i in range(data_size):
-    #         if data_not_zoned[i] == 'stop':
-    #             i += 1
-    #         else:
-    #             start_time = i
-    #
-    #             if 'stop' in data_not_zoned[i: data_size]:
-    #                 end_time = i + data_not_zoned[i: data_size].index('stop')
-    #             else:
-    #                 end_time = data_size
-    #
-    #             print start_time, end_time
-    #             print data[start_time: end_time]
-    #             top_value_temp = max(data[start_time: end_time])
-    #
-    #             zones.append({'start_time': start_time, 'end_time': end_time, 'top_value': top_value_temp})
-    #
-    #             i = end_time + 1
+    else:
+        i = 0
+        while i in range(data_size):
+            if data_not_zoned[i] == 'stop':
+                i += 1
+            else:
+                start_time = i
+
+                if 'stop' in data_not_zoned[i: data_size]:
+                    end_time = i + data_not_zoned[i: data_size].index('stop')
+                else:
+                    end_time = data_size
+
+                print start_time, end_time
+                print data[start_time: end_time]
+                top_value_temp = max(data[start_time: end_time])
+
+                zones.append({'start_time': start_time, 'end_time': end_time, 'top_value': top_value_temp})
+
+                i = end_time + 1
 
 # define a function that move the boundary and see if the slop it is downward over all
 def move_boundary(top_index, move_by, step):
@@ -87,13 +85,13 @@ def move_boundary(top_index, move_by, step):
 ###################### Initialize the program ######################
 
 # import data from txt file
-x, y_data = numpy.loadtxt('trump_day.txt', delimiter='    ', unpack=True)
+x, y_data = numpy.loadtxt('tesla.txt', delimiter='    ', unpack=True)
 
 y_data = tuple(y_data)
 data_size = len(y_data)
 y_average = numpy.average(y_data)
 
-step = 4
+step = 32
 
 # divide into 20 zones
 zones = []
