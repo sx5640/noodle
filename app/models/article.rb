@@ -268,18 +268,20 @@ class Article < ActiveRecord::Base
     puts(begin_date)
     puts(end_date)
 
+    step = 2.week
+
     i = 0
-    if File.exist?("python/#{permitted_params[:search]}.txt")
-      File.delete("python/#{permitted_params[:search]}.txt")
+    if File.exist?("python/#{permitted_params[:search]}_2week.txt")
+      File.delete("python/#{permitted_params[:search]}_2week.txt")
     end
-    File.new("python/#{permitted_params[:search]}.txt", "w+")
+    File.new("python/#{permitted_params[:search]}_2week.txt", "w+")
     sum = 0
-    while begin_date + i.day <= end_date
+    while begin_date + i*step <= end_date + step - 1.day
       article_in_month = articles.select { |article|
-      article.publication_time >= begin_date + i.day &&
-      article.publication_time < begin_date + (i+1).day}
+      article.publication_time >= begin_date + i*step &&
+      article.publication_time < begin_date + (i+1)*step}
       write_in = "#{sprintf("%03d", i)}    #{sprintf("%03d", article_in_month.length)}\n"
-      open("python/#{permitted_params[:search]}.txt", 'a') { |f|
+      open("python/#{permitted_params[:search]}_2week.txt", 'a') { |f|
         f.puts write_in
       }
       i += 1

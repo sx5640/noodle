@@ -26,7 +26,7 @@ def poly_fit(x,*p) :
     return recursive(n)
 
 ## Load data to fit
-x, y_data = numpy.loadtxt('data.txt', delimiter='    ', unpack=True)
+x, y_data = numpy.loadtxt('tesla_week.txt', delimiter='    ', unpack=True)
 
 average = sum(y_data)/len(y_data)
 
