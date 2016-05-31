@@ -50,7 +50,7 @@ class Keyword < ActiveRecord::Base
         end
       end
       # if the keyword exists, create a new_keyword_analysis that connect the existing_keyword to current article
-      existing_keyword = Keyword.find_by(name: keyword['value'], keyword_type: keyword['name'])
+      existing_keyword = self.find_by(name: keyword['value'], keyword_type: keyword['name'])
       if existing_keyword
         new_keyword_analysis = article.keyword_analyses.new
         new_keyword_analysis.keyword = existing_keyword
@@ -62,7 +62,7 @@ class Keyword < ActiveRecord::Base
         end
       else
         # otherwise, create a new_keyword, then create a new_keyword_analysis that connect it with the current article
-        new_keyword = Keyword.create(name: keyword['value'], keyword_type: keyword['name'])
+        new_keyword = self.create(name: keyword['value'], keyword_type: keyword['name'])
         new_keyword_analysis = article.keyword_analyses.new
         new_keyword_analysis.keyword = new_keyword
         if keyword['rank']

@@ -105,9 +105,9 @@ def move_all_boundaries(zones, article_count, num_of_zones, step, min_duration):
 ###################### Define initial variables ######################
 
 # import data from txt file
-x, y_data = numpy.loadtxt('trump.txt', delimiter='    ', unpack=True)
+x, y_data = numpy.loadtxt('trump_day.txt', delimiter='    ', unpack=True)
 
-step = 7
+step = 1
 min_duration = 2
 
 # divide into 20 zones
@@ -132,7 +132,7 @@ print zones
 def ploting_fun(x, zones, article_count):
     for i in range(num_of_zones):
         if x in range(zones[i]["start_time"], zones[i]["end_time"]):
-            return 10 * article_count[i] / (zones[i]["end_time"] - zones[i]["start_time"])
+            return article_count[i] / (zones[i]["end_time"] - zones[i]["start_time"])
 y = []
 
 
