@@ -14,6 +14,8 @@
 //= require jquery_ujs
 //= require turbolinks
 //= require handlebars-v4.0.5.js
+//= require three.min.js
 //= require timeline.js
 //= require minimap.js
 //= require search.js
+//= require visualization.js

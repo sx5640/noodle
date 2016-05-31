@@ -62,6 +62,9 @@ $(document).on('ready page:load', function() {
         // Build timeline, display it and push it onto stack along with its data
         displayTimelineView(data);
 
+        // Render 3D visualization
+        visualization.render(data['zones']);
+
         // Render minimap
         minimap.render(data['zones']);
         updateMinimap();
