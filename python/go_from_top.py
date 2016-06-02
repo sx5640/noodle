@@ -16,12 +16,12 @@ def find_top(data):
 
 
     if top_value > 2 * y_average:
-        start_time = move_boundary(top_index, -step, step)
-        end_time = move_boundary(top_index, step, step)
+        start_index = move_boundary(top_index, -step, step)
+        end_index = move_boundary(top_index, step, step)
 
-        zones.append({'start_time': start_time, 'end_time': end_time, 'top_value': top_value})
+        zones.append({'start_index': start_index, 'end_index': end_index, 'top_value': top_value})
 
-        for i in range(start_time, end_time + 1):
+        for i in range(start_index, end_index + 1):
             data_not_zoned[i] = 'stop'
             data_temp[i] = 0
 
@@ -33,20 +33,20 @@ def find_top(data):
             if data_not_zoned[i] == 'stop':
                 i += 1
             else:
-                start_time = i
+                start_index = i
 
                 if 'stop' in data_not_zoned[i: data_size]:
-                    end_time = i + data_not_zoned[i: data_size].index('stop')
+                    end_index = i + data_not_zoned[i: data_size].index('stop')
                 else:
-                    end_time = data_size
+                    end_index = data_size
 
-                print start_time, end_time
-                print data[start_time: end_time]
-                top_value_temp = max(data[start_time: end_time])
+                print start_index, end_index
+                print data[start_index: end_index]
+                top_value_temp = max(data[start_index: end_index])
 
-                zones.append({'start_time': start_time, 'end_time': end_time, 'top_value': top_value_temp})
+                zones.append({'start_index': start_index, 'end_index': end_index, 'top_value': top_value_temp})
 
-                i = end_time + 1
+                i = end_index + 1
 
 # define a function that move the boundary and see if the slop it is downward over all
 def move_boundary(top_index, move_by, step):
@@ -110,7 +110,7 @@ print zones
 
 def ploting_fun(x, zones):
     for i in range(len(zones)):
-        if x in range(zones[i]["start_time"], zones[i]["end_time"]+1):
+        if x in range(zones[i]["start_index"], zones[i]["end_index"]+1):
             return zones[i]['top_value']
     return 0
 

@@ -1,7 +1,11 @@
+require 'article_mixins/zone.rb'
+
 class Article < ActiveRecord::Base
   has_many :keyword_analyses
   has_many :keywords, through: :keyword_analyses
   has_many :saved_timelines
+
+  extend ArticleMixins::Zone
   # defining a method dedicated to get articles from NYTimes
   def self.create_articles(entry)
       # select data from each article where the JSON attributes has the same name with out Article class object.
@@ -157,7 +161,7 @@ class Article < ActiveRecord::Base
         selected_articles << (keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result)
       end
     end
-    return selected_articles.inject(selected_articles[0]) {|result, arr| result & arr }
+    return (selected_articles.inject(selected_articles[0]) {|result, arr| result & arr }).sort { |a, b| a[:publication_time] <=> b[:publication_time] }
 
   end
 
@@ -277,15 +281,15 @@ class Article < ActiveRecord::Base
     File.new("python/#{permitted_params[:search]}_2week.txt", "w+")
     sum = 0
     while begin_date + i*step <= end_date + step - 1.day
-      article_in_month = articles.select { |article|
+      articles_in_unit = articles.select { |article|
       article.publication_time >= begin_date + i*step &&
       article.publication_time < begin_date + (i+1)*step}
-      write_in = "#{sprintf("%03d", i)}    #{sprintf("%03d", article_in_month.length)}\n"
+      write_in = "#{sprintf("%03d", i)}    #{sprintf("%03d", articles_in_unit.length)}\n"
       open("python/#{permitted_params[:search]}_2week.txt", 'a') { |f|
         f.puts write_in
       }
       i += 1
-      sum += sprintf("%03d", article_in_month.length).to_i
+      sum += sprintf("%03d", articles_in_unit.length).to_i
     end
     puts(sum)
   end
