@@ -11,28 +11,29 @@ module ArticleMixins::Zone
     i = 0
 
     while begin_date + i*step <= end_date + step
+
+      start_time = begin_date + i*step
+      end_time = begin_date + (i+1)*step
+
       articles_in_unit = articles.select { |article|
       article.publication_time >= begin_date + i*step &&
       article.publication_time < begin_date + (i+1)*step}
 
       data[i] = {
-        start_time: begin_date + i*step,
-        end_time: begin_date + (i+1)*step,
+        start_time: start_time,
+        end_time: end_time,
         count: articles_in_unit.length,
       }
 
       i += 1
     end
-    data_sum = article.length
+    data_sum = articles.length
     data_size = data.length
     data_average = data_sum.to_f / data_size
     first_difference = []
     for i in (0..(data_size - 2))
       first_difference[i] = data[i+1][:count] - data[i][:count]
     end
-    puts("data: #{data}")
-    puts("data_sum: #{data_sum}")
-    puts("data_average: #{data_average}")
 
     params = {
       data: data,
@@ -123,7 +124,18 @@ module ArticleMixins::Zone
     return zones.sort { |a, b| a[:start_time] <=> b[:start_time] }
   end
 
-  def
+  def divide_into_zones_from_peak(articles, params)
+    zones = self.create_zone_from_peak(params)
+    for i in (0 .. (zones.length - 1))
+      zones[i][:article_list] = articles.select { |article|
+        article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]
+      }
+      zones[i][:count] = zones[i][:article_list].size
+      zones[i][:keywords] = generate_keywords(zones[i][:article_list])
+    end
+    zones = calculate_hotness(zones)
+    return zones
+  end
 
   private
   # define a method that determines the boundary around a given peak
@@ -193,4 +205,34 @@ module ArticleMixins::Zone
     end
 
   end
+
+  def calculate_hotness(zones)
+    # find the max, min, average
+    temp = zones.inject([0,100000,0]) do |temp, zone|
+      if temp[0] < zone[:count]
+        temp[0] = zone[:count]
+      end
+      if temp[1] > zone[:count]
+        temp[1] = zone[:count]
+      end
+      temp[2] += zone[:count]
+      temp
+    end
+    hottest = temp[0]
+    coldest = temp[1]
+    total = temp[2]
+    average = total/zones.length
+    #calculate hotness based on the count of articles in the zone, comparing to average, max, min
+    zones.each do |zone|
+      if zone[:count] > average
+        zone[:hotness] = (5 + (zone[:count] - average) * 5 / (hottest - average)).round
+      elsif zone[:count] < average
+        zone[:hotness] = 5 - ((average - zone[:count]) * 5 / (average - coldest)).round
+      elsif zone[:count] = average
+        zone[:hotness] = 5
+      end
+    end
+    return zones
+  end
+
 end

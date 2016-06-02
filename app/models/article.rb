@@ -161,12 +161,13 @@ class Article < ActiveRecord::Base
         selected_articles << (keyword_search_result | title_search_result | snippet_search_result | lead_paragraph_search_result | abstract_search_result)
       end
     end
-    return (selected_articles.inject(selected_articles[0]) {|result, arr| result & arr }).sort { |a, b| a[:publication_time] <=> b[:publication_time] }
+
+    return selected_articles.flatten.sort { |a, b| a[:publication_time] <=> b[:publication_time] }
 
   end
 
   #define a function that cut the selected time period into 20 zones with equal length. the function will return an array of zones, each as a hash, with start_time, end_time, list of articles within the time zone, count of articles within the zone, and 'hotness' of the zone
-  def self.divide_into_zones(articles)
+  def self.divide_into_unisized_zones(articles)
     # set the start_time to be the publication_time of the latest article, and end_time to be the publication_time of the oldest one. Then
     begin_date = articles.last.publication_time
     end_date = articles.first.publication_time
@@ -188,35 +189,6 @@ class Article < ActiveRecord::Base
   end
 
   # defining a function that can calculate "hottest" of a zone, based on the number of articles it has comparing to the average, and to the max and min
-  def self.calculate_hotness(zones)
-    # find the max, min, average
-    temp = zones.inject([0,100,0]) do |temp, zone|
-      if temp[0] < zone[:count]
-        temp[0] = zone[:count]
-      end
-      if temp[1] > zone[:count]
-        temp[1] = zone[:count]
-      end
-      temp[2] += zone[:count]
-      temp
-    end
-    hottest = temp[0]
-    coldest = temp[1]
-    total = temp[2]
-    average = total/20.0
-    #calculate hotness based on the count of articles in the zone, comparing to average, max, min
-    zones.each do |zone|
-      if zone[:count] > average
-        zone[:hotness] = (5 + (zone[:count] - average) * 5 / (hottest - average)).round
-      elsif zone[:count] < average
-        zone[:hotness] = 5 - ((average - zone[:count]) * 5 / (average - coldest)).round
-      elsif zone[:count] = average
-        zone[:hotness] = 5
-      end
-    end
-    return zones
-  end
-
   # defining a method that takes in a zone or a selection of articles and returns top keywords
   def self.generate_keywords(articles)
     # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
@@ -243,22 +215,29 @@ class Article < ActiveRecord::Base
 
   def self.analyze_articles(permitted_params)
     # selecting articles and sort them into chronological order
-    articles = Article.select_articles_from_database(permitted_params).sort { |a, b| b.publication_time <=> a.publication_time }
+    articles = Article.select_articles_from_database(permitted_params)
     puts(articles.size)
     # if find any articles, divide the article into zones.
     if articles.any?
-      result = {zones: Article.divide_into_zones(articles)}
-      result[:keywords] = Article.generate_keywords(articles)
-      result[:search_info] = {
-        search_string: permitted_params[:search],
-        start_time: articles.last.publication_time,
-        end_time: articles.first.publication_time
+      article_count = Article.count_articles(articles)
+      result = {
+        article_count: article_count[:data],
+        zones: Article.divide_into_zones_from_peak(articles, article_count),
+        keywords: Article.generate_keywords(articles),
+        search_info: {
+          search_string: permitted_params[:search],
+          start_time: articles.last.publication_time,
+          end_time: articles.first.publication_time
+        }
       }
       puts(result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
       # output the zones
     else
-      result[:search_info] = {
-        search_string: permitted_params[:search]}
+      result = {
+        search_info: {
+          search_string: permitted_params[:search]
+        }
+      }
     end
     return result
   end
