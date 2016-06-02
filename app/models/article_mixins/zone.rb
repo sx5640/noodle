@@ -133,6 +133,7 @@ module ArticleMixins::Zone
       zones[i][:count] = zones[i][:article_list].size
       zones[i][:keywords] = generate_keywords(zones[i][:article_list])
     end
+    zones = Keyword.remove_generic_keywords(zones)
     zones = calculate_hotness(zones)
     return zones
   end
@@ -209,13 +210,16 @@ module ArticleMixins::Zone
   def calculate_hotness(zones)
     # find the max, min, average
     temp = zones.inject([0,100000,0]) do |temp, zone|
-      if temp[0] < zone[:count]
-        temp[0] = zone[:count]
+      zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
+      zone_average_count = zone[:count] / zone_size
+
+      if temp[0] < zone_average_count
+        temp[0] = zone_average_count
       end
-      if temp[1] > zone[:count]
-        temp[1] = zone[:count]
+      if temp[1] > zone_average_count
+        temp[1] = zone_average_count
       end
-      temp[2] += zone[:count]
+      temp[2] += zone_average_count
       temp
     end
     hottest = temp[0]
@@ -224,13 +228,17 @@ module ArticleMixins::Zone
     average = total/zones.length
     #calculate hotness based on the count of articles in the zone, comparing to average, max, min
     zones.each do |zone|
-      if zone[:count] > average
-        zone[:hotness] = (5 + (zone[:count] - average) * 5 / (hottest - average)).round
-      elsif zone[:count] < average
-        zone[:hotness] = 5 - ((average - zone[:count]) * 5 / (average - coldest)).round
-      elsif zone[:count] = average
+      zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
+      zone_average_count = zone[:count] / zone_size
+
+      if zone_average_count > average
+        zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
+      elsif zone_average_count < average
+        zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
+      elsif zone_average_count == average
         zone[:hotness] = 5
       end
+      puts "zone_average_count: #{zone_average_count}"
     end
     return zones
   end

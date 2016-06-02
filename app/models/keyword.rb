@@ -74,4 +74,31 @@ class Keyword < ActiveRecord::Base
       new_keyword_analysis.save
     end
   end
+
+  # define a method that remove generic keywords from keyword list of each zone
+  def self.remove_generic_keywords(zones)
+    top_num = 9
+
+    # get top 20 keywords from each zone, put together and sort by how many times they appear in all zones
+    all_keywords = []
+    zones.each do |zone|
+      all_keywords += zones[0][:keywords][0..top_num].map { |e| e[:keyword]  }
+    end
+
+    flatten_all_keywrds = all_keywords.flatten
+
+    flatten_all_keywrds.sort { |a, b| all_keywords.count(b) <=> all_keywords.count(a) }
+
+    generic_keywords = flatten_all_keywrds[0..19]
+    puts "generic_keywords: #{generic_keywords}"
+
+    zones.each do |zone|
+      zone[:keywords][0..top_num].each do |keyword|
+        if generic_keywords.include?(keyword[:keyword])
+          zone[:keywords].delete(keyword)
+        end
+      end
+    end
+    return zones
+  end
 end
