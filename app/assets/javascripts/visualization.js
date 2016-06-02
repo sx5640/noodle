@@ -139,6 +139,7 @@ var visualization = (function() {
         cube.receiveShadow = true;
         cube.scale.setX(0.033);
         cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
+        cube.material.opacity = verticalSize/625;
         boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
         scene.add( cube );
       }
