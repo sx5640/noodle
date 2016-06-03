@@ -12,6 +12,11 @@ $(document).on('ready page:load', function() {
   visualization.init();
 
   //
+  // 3D visualization selection state
+  //
+  var isSelecting = false;
+
+  //
   // Get saved timeline, populated by the user profile
   //
   var savedTimeline = $('#search-section').data();
@@ -246,6 +251,52 @@ $(document).on('ready page:load', function() {
     var newY = minimapY/minimapHeight * zoneListHeight;
 
     $(document).scrollTop(newY);
+  });
+
+  //
+  // Handle event: mouse over on minimap
+  //
+  $('#minimap-container').on('mouseover', function(eventObject) {
+    var source = eventObject.target;
+
+    if ($(source).hasClass('circle')) {
+      $('.minimap-circle-hover').removeClass('minimap-circle-hover');
+      $(source).toggleClass('minimap-circle-hover');
+    }
+  });
+
+  //
+  // Handle event: mouse move on 3D visualization
+  //
+  $('#visualization-container').on('mousemove', function(eventObject) {
+    var msg1 = "visualization - mousemove: ";
+    var x = (eventObject.pageX - $(this).offset().left);
+    var y = (eventObject.pageY - $(this).offset().top)
+    msg1 +=  x + ', ' + y;
+    console.log(msg1);
+
+    if (isSelecting) {
+      var width = x - $('#selection').position().left;
+      $('#selection').css('width', width + 'px');
+    }
+  });
+
+  //
+  // Handle event: click on 3D visualization
+  //
+  $('#visualization-container').on('click', function(eventObject) {
+    var msg1 = "visualization - click: ";
+    var x = (eventObject.pageX - $(this).offset().left);
+    var y = (eventObject.pageY - $(this).offset().top)
+    msg1 +=  x + ', ' + y;
+    console.log(msg1);
+
+    if (!isSelecting) {
+      var htmlSelection = '<div id="selection"></div>';
+      $('#visualization-container').prepend(htmlSelection);
+      $('#selection').css('left', x + 'px');
+      isSelecting = true;
+    }
   });
 
   //

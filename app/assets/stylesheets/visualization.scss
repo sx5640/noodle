@@ -3,4 +3,18 @@
   width: 75%;
   height: 256px;
   cursor: pointer;
+  position: relative;
+}
+
+#selection {
+  width: 2px;
+  height: 256px;
+  top: 0px;
+  position: absolute;
+  background-color: rgba(0, 200, 255, 0.5);
+  opacity: 50%;
+  z-index: 1000;
+}
+
+#threejs {
 }

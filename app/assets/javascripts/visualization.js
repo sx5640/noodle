@@ -37,9 +37,9 @@ var visualization = (function() {
       renderer.shadowMapSoft = true;
 
       // Set camera's z position
-      camera.position.z = 2500;
-      camera.position.y = 1600;
-      camera.rotation.x = -.35;
+      camera.position.z = 2800;
+      camera.position.y = 1250;
+      camera.rotation.x = -.20;
 
       // Create ground plane
       var groundMaterial = new THREE.MeshPhongMaterial({
@@ -72,8 +72,8 @@ var visualization = (function() {
       scene.add(directionalLight);
 
       // Attach Three.js canvas to container element
-      $( '#visualization-container' ).empty();
-      $( '#visualization-container' ).append( renderer.domElement );
+      $( '#threejs' ).empty();
+      $( '#threejs' ).append( renderer.domElement );
 
       // Define render callback animation function and pass it to requestAnimationFrame()
       var animationFrameCounter = 1;
