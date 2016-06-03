@@ -307,7 +307,6 @@ $(document).on('ready page:load', function() {
 
       // Loop through each zone and combine it with the templates
       for ( var i = data['zones'].length - 1; i >= 0 ; i-- ) {
-        console.log(data['zones'][i]);
 
         var zone = data['zones'][i];
 

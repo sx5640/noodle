@@ -45,7 +45,7 @@ var visualization = (function() {
       var groundMaterial = new THREE.MeshPhongMaterial({
         color: 0xffffff
       });
-      groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(5000, 5000), groundMaterial);
+      groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(8000, 2000), groundMaterial);
       groundPlane.rotation.x = -Math.PI / 2;
       groundPlane.receiveShadow = true
       scene.add(groundPlane);
@@ -61,12 +61,12 @@ var visualization = (function() {
       directionalLight.shadowCameraVisible = true;
       directionalLight.shadowMapWidth = 2048;
       directionalLight.shadowMapHeight = 2048;
-      var d = 2000;
+      var d = 4000;
       directionalLight.shadowCameraLeft = -d;
       directionalLight.shadowCameraRight = d;
       directionalLight.shadowCameraTop = d;
       directionalLight.shadowCameraBottom = -d;
-      directionalLight.shadowCameraFar = 10000;
+      directionalLight.shadowCameraFar = 15000;
       directionalLight.shadowDarkness = 0.2;
       scene.add(directionalLight);
 
@@ -90,7 +90,6 @@ var visualization = (function() {
                 sinScale = sinScale * sinScale;
                 cube.scale.setY(sinScale);
                 cube.position.setY(targetHeight * sinScale / 2);
-                // console.log(boxMesh);
               }
               animationFrameCounter++;
               if (animationFrameCounter > animationFrameMax) {
@@ -129,11 +128,10 @@ var visualization = (function() {
       // Create one cube object for each zone (even empty zones) and add them to the scene
       var numZones = zones.length;
       for (var i = 0; i < numZones; i++) {
-        console.log('i: ', i);
         if (zones[i].count > 0) {
           var spacing = 12;
           var zone = zones[i];
-          var verticalSize = 25 + zone.count * 500;
+          var verticalSize = 5 + zone.count * 80;
           var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
           var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
           var cube = new THREE.Mesh( boxGeometry, boxMaterial );
@@ -144,8 +142,6 @@ var visualization = (function() {
           cube.material.opacity = verticalSize/625;
           boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
           scene.add( cube );
-
-          console.log('article count: ', zone.count);
         }
       }
     }
