@@ -269,13 +269,8 @@ $(document).on('ready page:load', function() {
   // Handle event: mouse move on 3D visualization
   //
   $('#visualization-container').on('mousemove', function(eventObject) {
-    var msg1 = "visualization - mousemove: ";
-    var x = (eventObject.pageX - $(this).offset().left);
-    var y = (eventObject.pageY - $(this).offset().top)
-    msg1 +=  x + ', ' + y;
-    console.log(msg1);
-
     if (isSelecting) {
+      var x = (eventObject.pageX - $(this).offset().left);
       var width = x - $('#selection').position().left;
       $('#selection').css('width', width + 'px');
     }
@@ -285,17 +280,14 @@ $(document).on('ready page:load', function() {
   // Handle event: click on 3D visualization
   //
   $('#visualization-container').on('click', function(eventObject) {
-    var msg1 = "visualization - click: ";
-    var x = (eventObject.pageX - $(this).offset().left);
-    var y = (eventObject.pageY - $(this).offset().top)
-    msg1 +=  x + ', ' + y;
-    console.log(msg1);
-
     if (!isSelecting) {
+      var x = (eventObject.pageX - $(this).offset().left);
       var htmlSelection = '<div id="selection"></div>';
       $('#visualization-container').prepend(htmlSelection);
       $('#selection').css('left', x + 'px');
       isSelecting = true;
+    } else {
+      isSelecting = false;
     }
   });
 
