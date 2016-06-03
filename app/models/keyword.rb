@@ -77,21 +77,27 @@ class Keyword < ActiveRecord::Base
 
   # define a method that remove generic keywords from keyword list of each zone
   def self.remove_generic_keywords(zones)
-    top_num = 9
+    top_num = 19
+    allowed_generic_level = zones.length / 3
 
-    # get top 20 keywords from each zone, put together and sort by how many times they appear in all zones
+    # get top 20 keywords from each zone, put together and select by how many times they appear in all zones
     all_keywords = []
     zones.each do |zone|
-      all_keywords += zones[0][:keywords][0..top_num].map { |e| e[:keyword]  }
+      all_keywords += zone[:keywords][0..top_num].map { |e| e[:keyword]  }
     end
 
-    flatten_all_keywrds = all_keywords.flatten
+    uniq_all_keywords = all_keywords.uniq
 
-    flatten_all_keywrds.sort { |a, b| all_keywords.count(b) <=> all_keywords.count(a) }
+    puts "all_keywords size: #{all_keywords.size}"
+    uniq_all_keywords.each { |e|  puts "#{e}: #{all_keywords.count(e)}"}
+    puts "============================"
 
-    generic_keywords = flatten_all_keywrds[0..19]
-    puts "generic_keywords: #{generic_keywords}"
+    generic_keywords = uniq_all_keywords.select { |e| all_keywords.count(e) > allowed_generic_level }
 
+    generic_keywords.each { |e|  puts "#{e}: #{all_keywords.count(e)}"}
+    puts "============================"
+
+    # for each timezone, remove generic_keywords from their list
     zones.each do |zone|
       zone[:keywords][0..top_num].each do |keyword|
         if generic_keywords.include?(keyword[:keyword])

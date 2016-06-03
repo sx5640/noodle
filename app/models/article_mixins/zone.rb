@@ -37,7 +37,7 @@ module ArticleMixins::Zone
 
     params = {
       data: data,
-      data_not_zoned: data,
+      data_not_zoned: data.clone,
       first_difference: first_difference,
       data_size: data_size,
       data_average: data_average
@@ -48,11 +48,13 @@ module ArticleMixins::Zone
   # define a recursive method that find the peak in a given data, and define a zone surrounding the peak.
   def create_zone_from_peak(params)
     # Initialize the function
-    data_temp = Array.new(params[:data])
-    data_not_zoned = Array.new(params[:data_not_zoned])
-    first_difference = params[:first_difference]
-    data_size = params[:data_size]
-    data_average = params[:data_average]
+      # deep copying the params
+    params_temp = Marshal.load(Marshal.dump(params))
+    data_temp = params_temp[:data]
+    data_not_zoned = params_temp[:data_not_zoned]
+    first_difference = params_temp[:first_difference]
+    data_size = params_temp[:data_size]
+    data_average = params_temp[:data_average]
     zones = []
 
     top_time_unit = data_temp.max {|a, b| a[:count] <=> b[:count]}
@@ -68,7 +70,6 @@ module ArticleMixins::Zone
       # call the move_boundary method to get the boundary of the top peak
       start_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, -step, step)
       end_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, step, step)
-
       # save the result
       zones << {
         start_time: data_temp[start_index][:start_time], end_time: data_temp[end_index][:end_time],
@@ -82,9 +83,6 @@ module ArticleMixins::Zone
       end
 
       # method recurs
-      params_temp = params
-      params_temp[:data] = data_temp
-      params_temp[:data_not_zoned] = data_not_zoned
       zones += create_zone_from_peak(params_temp)
 
     # otherwise, it will break
@@ -238,7 +236,6 @@ module ArticleMixins::Zone
       elsif zone_average_count == average
         zone[:hotness] = 5
       end
-      puts "zone_average_count: #{zone_average_count}"
     end
     return zones
   end
