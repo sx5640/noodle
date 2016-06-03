@@ -38,7 +38,7 @@ var visualization = (function() {
 
       // Set camera's z position
       camera.position.z = 2500;
-      camera.position.y = 1500;
+      camera.position.y = 1600;
       camera.rotation.x = -.35;
 
       // Create ground plane
@@ -132,7 +132,7 @@ var visualization = (function() {
         if (zones[i].count > 0) {
           var spacing = 16;
           var zone = zones[i];
-          var verticalSize = 5 + zone.count * 80;
+          var verticalSize = 5 + zone.count * 120;
           var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
           var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
           var cube = new THREE.Mesh( boxGeometry, boxMaterial );
@@ -141,7 +141,7 @@ var visualization = (function() {
           cube.receiveShadow = true;
           cube.scale.setX(xScale);
           cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
-          cube.material.opacity = .2 + verticalSize/500;
+          cube.material.opacity = verticalSize/500;
           boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
           scene.add( cube );
         }
