@@ -129,19 +129,24 @@ var visualization = (function() {
       // Create one cube object for each zone (even empty zones) and add them to the scene
       var numZones = zones.length;
       for (var i = 0; i < numZones; i++) {
-        var spacing = 250;
-        var zone = zones[i];
-        var verticalSize = 10 + zone.count * 25;
-        var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
-        var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
-        var cube = new THREE.Mesh( boxGeometry, boxMaterial );
-        cube.castShadow = true;
-        cube.receiveShadow = true;
-        cube.scale.setX(0.033);
-        cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
-        cube.material.opacity = verticalSize/625;
-        boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
-        scene.add( cube );
+        console.log('i: ', i);
+        if (zones[i].count > 0) {
+          var spacing = 12;
+          var zone = zones[i];
+          var verticalSize = 25 + zone.count * 500;
+          var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
+          var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
+          var cube = new THREE.Mesh( boxGeometry, boxMaterial );
+          cube.castShadow = true;
+          cube.receiveShadow = true;
+          cube.scale.setX(0.033);
+          cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
+          cube.material.opacity = verticalSize/625;
+          boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
+          scene.add( cube );
+
+          console.log('article count: ', zone.count);
+        }
       }
     }
   }

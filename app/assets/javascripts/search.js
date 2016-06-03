@@ -68,7 +68,7 @@ $(document).on('ready page:load', function() {
         displayTimelineView(data);
 
         // Render 3D visualization
-        visualization.render(data['zones']);
+        visualization.render(data['article_count']);
 
         // Render minimap
         minimap.render(data['zones']);
