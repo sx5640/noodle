@@ -4,7 +4,7 @@ module ArticleMixins::Zone
     begin_date = articles.first.publication_time
     end_date = articles.last.publication_time
 
-    step = ((end_date - begin_date) / 1.year).to_i.day
+    step = ((end_date - begin_date) / 1.year + 1).to_i.day
 
     data = []
 
