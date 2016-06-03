@@ -194,7 +194,7 @@ class Article < ActiveRecord::Base
   def self.analyze_articles(permitted_params)
     # selecting articles and sort them into chronological order
     articles = Article.select_articles_from_database(permitted_params)
-    puts(articles.size)
+    puts "total:#{articles.size}"
     # if find any articles, divide the article into zones.
     if articles.any?
       article_count = Article.count_articles(articles)
@@ -208,7 +208,7 @@ class Article < ActiveRecord::Base
           end_time: articles.first.publication_time
         }
       }
-      puts(result[:zones].inject(0) {|sum, zone| sum + zone[:count]})
+      puts"in zones: #{result[:zones].inject(0) {|sum, zone| sum + zone[:count]}}"
       # output the zones
     else
       result = {
@@ -252,43 +252,68 @@ class Article < ActiveRecord::Base
     puts(sum)
   end
 
-  def self.get_guardian_articles(search_terms, begin_date, end_date)
+
+  def self.create_guardian_articles(entry)
+      # select data from each article where the JSON attributes has the same name with out Article class object.
+      # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
+    unless self.find_by(web_url: entry['webUrl'])
+      data = {
+        title: entry['webTitle'],
+        publication_time: entry['webPublicationDate'].to_datetime,
+        section: entry['sectionName'],
+        web_url: entry['webUrl']
+      }
+
+      article = self.new(data)
+      # save int database
+      article.save
+
+      # now keywords
+      Keyword.get_text_razor_keywords(article)
+      # Keyword.get_nytimes_keywords(entry, article)
+    end
+  end
+
+  def self.get_guardian_articles(search_terms, begin_date)
     articles = []
     search_terms = search_terms.split(" ").join("%20")
     # loop through page 0 to page 100
-    for i in (0 .. 100)
+    for i in (1 .. 100)
       # get 10 articles with given keyword, timeframe and page #
       response = JSON.parse(
-      Typhoeus.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=#{search_terms}&page=#{i}&begin_date=#{begin_date}&end_date=#{end_date}&sort=newest&api-key=#{Rails.application.secrets.nytimes_key}").body)
+      Typhoeus.get("http://content.guardianapis.com/search?q=#{search_terms}&page=#{i}&from-date=#{begin_date}&api-key=#{Rails.application.secrets.guardian_key}").body)
       puts(i)
       # if no article returns, break the loop
-      if response["response"]["docs"].empty?
-        break
-      else
+      if response["response"]["results"]
+
         # iterate through the 10 articles get from each call, and clean up the data
-        articles << response["response"]["docs"]
+        articles << response["response"]["results"]
 
-
-        # response["response"]["docs"].each do |entry|
-        threads = []
-        num_of_threads = 4
-        num_of_threads.times do |t|
-          threads[t] = Thread.new do
-            if response["response"]["docs"][t]
-              self.create_articles(response["response"]["docs"][t])
-              if response["response"]["docs"][t+4]
-                self.create_articles(response["response"]["docs"][t+4])
-                if response["response"]["docs"][t+8]
-                  self.create_articles(response["response"]["docs"][t+8])
-                end
-              end
-            end
-          end
+        response["response"]["results"].each do |entry|
+          self.create_guardian_articles(entry)
         end
-        threads.each {|t| t.join}
+
+        # threads = []
+        # num_of_threads = 2
+        # num_of_threads.times do |t|
+        #   threads[t] = Thread.new do
+        #     self.threading(response["response"]["results"], num_of_threads, t)
+        #   end
+        # end
+        # threads.each {|t| t.join}
+
+      else
+        break
       end
     end
     return articles
   end
 
+  private
+  def self.threading(data, num_of_threads, start_num)
+    if start_num < 10 && data[start_num]
+      self.create_guardian_articles(data[start_num])
+      threading(data, num_of_threads, start_num + num_of_threads)
+    end
+  end
 end

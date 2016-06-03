@@ -75,9 +75,59 @@ class Keyword < ActiveRecord::Base
     end
   end
 
+  def self.get_text_razor_keywords(article)
+    response = JSON.parse(Typhoeus.post(
+      "http://api.textrazor.com",
+      headers: {
+        'x-textrazor-key' => Rails.application.secrets.text_razor_key
+      },
+      body: {
+        url: article[:web_url],
+        extractors: 'entities'
+      }
+    ).body)
+
+    puts "article_id = #{article[:id]}"
+
+    if response['error']
+      puts("error: #{response['error']}")
+
+    elsif response['response']['entities']
+      data = response['response']['entities']
+      data.sort! { |a, b| b['relevanceScore'] <=> a['relevanceScore']}
+      data.uniq! { |e| e['entityId']}
+      data.select! {|e| e['confidenceScore'] > 1}
+
+      data.each do |keyword|
+        # if the keyword exists, create a new_keyword_analysis that connect the existing_keyword to current article
+        existing_keyword = self.find_by(name: keyword['entityId'])
+        if existing_keyword
+          new_keyword_analysis = article.keyword_analyses.new
+          new_keyword_analysis.keyword = existing_keyword
+          # calculate relevance based on the ranking of the keyword given by NYTimes
+          if keyword['relevanceScore']
+            new_keyword_analysis[:relevance] = keyword['relevanceScore'].to_f
+          else
+            new_keyword_analysis[:relevance] = 0.1
+          end
+        else
+          # otherwise, create a new_keyword, then create a new_keyword_analysis that connect it with the current article
+          new_keyword = self.create(name: keyword['entityId'])
+          new_keyword_analysis = article.keyword_analyses.new
+          new_keyword_analysis.keyword = new_keyword
+          if keyword['relevanceScore'].to_f
+            new_keyword_analysis[:relevance] = keyword['relevanceScore'].to_f
+          else
+            new_keyword_analysis[:relevance] = 0.1
+          end
+        end
+        new_keyword_analysis.save
+      end
+    end
+  end
   # define a method that remove generic keywords from keyword list of each zone
   def self.remove_generic_keywords(zones)
-    top_num = 19
+    top_num = 5
     allowed_generic_level = zones.length / 3
 
     # get top 20 keywords from each zone, put together and select by how many times they appear in all zones

@@ -68,7 +68,7 @@ module ArticleMixins::Zone
     if top_value > min_peak_multiplier * data_average
 
       # call the move_boundary method to get the boundary of the top peak
-      start_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, -step, step)
+      start_index = top_index
       end_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, step, step)
       # save the result
       zones << {
@@ -86,38 +86,38 @@ module ArticleMixins::Zone
       zones += create_zone_from_peak(params_temp)
 
     # otherwise, it will break
-    else
-      # go through all points in data_not_zoned, and make cold zones
-
-      i = 0
-      while i < data_size
-        # skip hot zones
-        if data_not_zoned[i] == 'stop'
-          i += 1
-        else
-          # start a cold zone
-          start_index = i
-
-          # end at a hot zone or end of the data
-          if  data_not_zoned[i..(data_size - 1)].include?('stop')
-            end_index = i + data_not_zoned[i.. (data_size - 1)].index('stop') - 1
-          else
-            end_index = data_size - 1
-          end
-
-          # calculate top_value
-          top_time_unit_temp = data_temp[start_index..end_index].max {|a, b| a[:count] <=> b[:count]}
-          top_value_temp = top_time_unit_temp[:count]
-
-          # save the zone
-          zones << {
-            start_time: data_temp[start_index][:start_time], end_time: data_temp[end_index][:end_time],
-            top_value: top_value_temp
-          }
-
-          i = end_index + 1
-        end
-      end
+    # else
+    #   # go through all points in data_not_zoned, and make cold zones
+    #
+    #   i = 0
+    #   while i < data_size
+    #     # skip hot zones
+    #     if data_not_zoned[i] == 'stop'
+    #       i += 1
+    #     else
+    #       # start a cold zone
+    #       start_index = i
+    #
+    #       # end at a hot zone or end of the data
+    #       if  data_not_zoned[i..(data_size - 1)].include?('stop')
+    #         end_index = i + data_not_zoned[i.. (data_size - 1)].index('stop') - 1
+    #       else
+    #         end_index = data_size - 1
+    #       end
+    #
+    #       # calculate top_value
+    #       top_time_unit_temp = data_temp[start_index..end_index].max {|a, b| a[:count] <=> b[:count]}
+    #       top_value_temp = top_time_unit_temp[:count]
+    #
+    #       # save the zone
+    #       zones << {
+    #         start_time: data_temp[start_index][:start_time], end_time: data_temp[end_index][:end_time],
+    #         top_value: top_value_temp
+    #       }
+    #
+    #       i = end_index + 1
+    #     end
+    #   end
     end
     return zones.sort { |a, b| a[:start_time] <=> b[:start_time] }
   end
