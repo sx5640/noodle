@@ -162,34 +162,12 @@ class Article < ActiveRecord::Base
       end
     end
 
-    return selected_articles.flatten.sort { |a, b| a[:publication_time] <=> b[:publication_time] }
+    output_articles = selected_articles.inject {|result, e| result - (result - e) }
+
+    return output_articles.uniq.sort { |a, b| a[:publication_time] <=> b[:publication_time] }
 
   end
 
-  #define a function that cut the selected time period into 20 zones with equal length. the function will return an array of zones, each as a hash, with start_time, end_time, list of articles within the time zone, count of articles within the zone, and 'hotness' of the zone
-  def self.divide_into_unisized_zones(articles)
-    # set the start_time to be the publication_time of the latest article, and end_time to be the publication_time of the oldest one. Then
-    begin_date = articles.last.publication_time
-    end_date = articles.first.publication_time
-    # the +1 is to make sure the last zone will include the newest article
-    time_unit = (end_date - begin_date + 1) / 20
-
-    zones = []
-    for i in (0 .. 19)
-      zones[i] = {
-                  start_time: begin_date + time_unit * i,
-                  end_time: begin_date + time_unit * (i + 1)}
-      zones[i][:article_list] = articles.select { |article|
-                  article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]}
-      zones[i][:count] = zones[i][:article_list].size
-      zones[i][:keywords] = generate_keywords(zones[i][:article_list])
-    end
-    zones = self.calculate_hotness(zones)
-    return zones
-  end
-
-  # defining a function that can calculate "hottest" of a zone, based on the number of articles it has comparing to the average, and to the max and min
-  # defining a method that takes in a zone or a selection of articles and returns top keywords
   def self.generate_keywords(articles)
     # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
     keywords_collection = {}
@@ -242,6 +220,7 @@ class Article < ActiveRecord::Base
     return result
   end
 
+  # this is a method that used to write article_count into txt file, then read by python script
   def self.write_txt(permitted_params)
     articles = Article.select_articles_from_database(permitted_params).sort { |a, b| b.publication_time <=> a.publication_time }
     puts(articles.length)
@@ -271,6 +250,45 @@ class Article < ActiveRecord::Base
       sum += sprintf("%03d", articles_in_unit.length).to_i
     end
     puts(sum)
+  end
+
+  def self.get_guardian_articles(search_terms, begin_date, end_date)
+    articles = []
+    search_terms = search_terms.split(" ").join("%20")
+    # loop through page 0 to page 100
+    for i in (0 .. 100)
+      # get 10 articles with given keyword, timeframe and page #
+      response = JSON.parse(
+      Typhoeus.get("http://api.nytimes.com/svc/search/v2/articlesearch.json?q=#{search_terms}&page=#{i}&begin_date=#{begin_date}&end_date=#{end_date}&sort=newest&api-key=#{Rails.application.secrets.nytimes_key}").body)
+      puts(i)
+      # if no article returns, break the loop
+      if response["response"]["docs"].empty?
+        break
+      else
+        # iterate through the 10 articles get from each call, and clean up the data
+        articles << response["response"]["docs"]
+
+
+        # response["response"]["docs"].each do |entry|
+        threads = []
+        num_of_threads = 4
+        num_of_threads.times do |t|
+          threads[t] = Thread.new do
+            if response["response"]["docs"][t]
+              self.create_articles(response["response"]["docs"][t])
+              if response["response"]["docs"][t+4]
+                self.create_articles(response["response"]["docs"][t+4])
+                if response["response"]["docs"][t+8]
+                  self.create_articles(response["response"]["docs"][t+8])
+                end
+              end
+            end
+          end
+        end
+        threads.each {|t| t.join}
+      end
+    end
+    return articles
   end
 
 end

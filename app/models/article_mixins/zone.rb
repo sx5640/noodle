@@ -136,6 +136,28 @@ module ArticleMixins::Zone
     return zones
   end
 
+  #define a function that cut the selected time period into 20 zones with equal length. the function will return an array of zones, each as a hash, with start_time, end_time, list of articles within the time zone, count of articles within the zone, and 'hotness' of the zone
+  def divide_into_unisized_zones(articles)
+    # set the start_time to be the publication_time of the latest article, and end_time to be the publication_time of the oldest one. Then
+    begin_date = articles.last.publication_time
+    end_date = articles.first.publication_time
+    # the +1 is to make sure the last zone will include the newest article
+    time_unit = (end_date - begin_date + 1) / 20
+
+    zones = []
+    for i in (0 .. 19)
+      zones[i] = {
+                  start_time: begin_date + time_unit * i,
+                  end_time: begin_date + time_unit * (i + 1)}
+      zones[i][:article_list] = articles.select { |article|
+                  article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]}
+      zones[i][:count] = zones[i][:article_list].size
+      zones[i][:keywords] = generate_keywords(zones[i][:article_list])
+    end
+    zones = self.calculate_hotness(zones)
+    return zones
+  end
+
   private
   # define a method that determines the boundary around a given peak
   def move_boundary(first_difference, data_not_zoned, data_size, top_index, move_by, step)
@@ -205,6 +227,8 @@ module ArticleMixins::Zone
 
   end
 
+  # defining a function that can calculate "hottest" of a zone, based on the number of articles it has comparing to the average, and to the max and min
+  # defining a method that takes in a zone or a selection of articles and returns top keywords
   def calculate_hotness(zones)
     # find the max, min, average
     temp = zones.inject([0,100000,0]) do |temp, zone|
