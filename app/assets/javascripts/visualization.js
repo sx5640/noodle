@@ -45,8 +45,9 @@ var visualization = (function() {
       var groundMaterial = new THREE.MeshPhongMaterial({
         color: 0xffffff
       });
-      groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(8000, 2000), groundMaterial);
+      groundPlane = new THREE.Mesh(new THREE.PlaneGeometry(15000, 2000), groundMaterial);
       groundPlane.rotation.x = -Math.PI / 2;
+      groundPlane.position.setY(-5);
       groundPlane.receiveShadow = true
       scene.add(groundPlane);
 
@@ -129,17 +130,18 @@ var visualization = (function() {
       var numZones = zones.length;
       for (var i = 0; i < numZones; i++) {
         if (zones[i].count > 0) {
-          var spacing = 12;
+          var spacing = 16;
           var zone = zones[i];
           var verticalSize = 5 + zone.count * 80;
           var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
           var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
           var cube = new THREE.Mesh( boxGeometry, boxMaterial );
+          var xScale = Math.max(0.05, 0.25 * 1/(zone.count * zone.count));
           cube.castShadow = true;
           cube.receiveShadow = true;
-          cube.scale.setX(0.033);
+          cube.scale.setX(xScale);
           cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
-          cube.material.opacity = verticalSize/625;
+          cube.material.opacity = .2 + verticalSize/500;
           boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
           scene.add( cube );
         }

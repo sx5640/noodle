@@ -1,4 +1,4 @@
-<main>
+<div class="container">
   <%= tag("div", id: "search-section", data: params) %>
 
     <h1 class="search-title">Search</h1>
@@ -17,10 +17,12 @@
   <div id="keywords-container">
     <ul id="top-keywords-list"></ul>
   </div>
+</div>
 
-  <div id="visualization-container">
-  </div>
+<div id="visualization-container">
+</div>
 
+<div class="container">
   <div id="timeline-nav">
   </div>
 
@@ -29,7 +31,7 @@
 
   <div id="minimap-container">
   </div>
-</main>
+</div>
 
 <script id="template-visualization" type="text/x-handlebars-template">
 	<li class="visualization-container">
