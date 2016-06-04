@@ -120,26 +120,7 @@ $(document).on('ready page:load', function() {
         // Branch 1 (20 or more articles) - Create and render sub timeline
         ////
 
-        var start_date = new Date(zone.start_time);
-        var end_date = new Date(zone.end_time);
-        var url = '/articles/search?utf8=%E2%9C%93&search=' + data.search_info.search_string + '&start_time=' + zone.start_time + '&end_time=' + zone.end_time;
-        $.ajax({
-          url: url,
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) {
-            // Build timeline, display it and push it onto stack along with its data
-            displayTimelineView(data);
-
-            // Render minimap
-            minimap.render(data['zones']);
-            updateMinimap();
-
-            // Add a 'back to timeline' link - the most basic timeline navigation
-            var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
-            $('#timeline-nav').html(htmlBackToTimeline);
-          }
-        });
+        subSearch(data.search_info.search_string, zone.start_time, zone.end_time);
 
       } else {
 
@@ -201,6 +182,10 @@ $(document).on('ready page:load', function() {
 
     // Add the previous view (now the last view in the view stack) to the live dom, displaying it
     $('#content-container').html(global_views[global_views.length - 1]);
+
+    // Re-render 3D visualization to reflect the current timeline view
+    data = global_data[global_data.length - 1];
+    visualization.render(data['article_count']);
 
     // Re-render the minimap to reflect the current timeline view
     minimap.render(global_data[global_data.length - 1]['zones']);
