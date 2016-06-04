@@ -12,6 +12,12 @@ $(document).on('ready page:load', function() {
   visualization.init();
 
   //
+  // 3D visualization selection state variables
+  //
+  var isSelecting = false;
+  var selectionX; // x offset of initial mouse click that creates selection
+
+  //
   // Get saved timeline, populated by the user profile
   //
   var savedTimeline = $('#search-section').data();
@@ -114,26 +120,7 @@ $(document).on('ready page:load', function() {
         // Branch 1 (20 or more articles) - Create and render sub timeline
         ////
 
-        var start_date = new Date(zone.start_time);
-        var end_date = new Date(zone.end_time);
-        var url = '/articles/search?utf8=%E2%9C%93&search=' + data.search_info.search_string + '&start_time=' + zone.start_time + '&end_time=' + zone.end_time;
-        $.ajax({
-          url: url,
-          type: 'GET',
-          dataType: 'json',
-          success: function(data) {
-            // Build timeline, display it and push it onto stack along with its data
-            displayTimelineView(data);
-
-            // Render minimap
-            minimap.render(data['zones']);
-            updateMinimap();
-
-            // Add a 'back to timeline' link - the most basic timeline navigation
-            var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
-            $('#timeline-nav').html(htmlBackToTimeline);
-          }
-        });
+        subSearch(data.search_info.search_string, zone.start_time, zone.end_time);
 
       } else {
 
@@ -186,6 +173,8 @@ $(document).on('ready page:load', function() {
   $('#timeline-nav').on('click', function(eventObject) {
     eventObject.preventDefault();
 
+    var data;
+
     // Remove current view
     $('#content-container').empty();
 
@@ -195,6 +184,10 @@ $(document).on('ready page:load', function() {
 
     // Add the previous view (now the last view in the view stack) to the live dom, displaying it
     $('#content-container').html(global_views[global_views.length - 1]);
+
+    // Re-render 3D visualization to reflect the current timeline view
+    data = global_data[global_data.length - 1];
+    visualization.render(data['article_count']);
 
     // Re-render the minimap to reflect the current timeline view
     minimap.render(global_data[global_data.length - 1]['zones']);
@@ -247,6 +240,142 @@ $(document).on('ready page:load', function() {
 
     $(document).scrollTop(newY);
   });
+
+  //
+  // Handle event: mouse over on minimap
+  //
+  $('#minimap-container').on('mouseover', function(eventObject) {
+    var source = eventObject.target;
+
+    if ($(source).hasClass('circle')) {
+      $('.minimap-circle-hover').removeClass('minimap-circle-hover');
+      $(source).toggleClass('minimap-circle-hover');
+    }
+  });
+
+  //
+  // Handle event: click on 3D visualization
+  //
+  $('#visualization-container').on('click', function(eventObject) {
+    var currentX = (eventObject.pageX - $(this).offset().left);
+    var data = global_data[global_data.length - 1];
+    var articleCountArray = data['article_count'];
+    var articleCountArraySize = articleCountArray.length;
+    var pixelsPerArticleCount = 2.672672672672672;
+    var widthOfGraph = articleCountArraySize * pixelsPerArticleCount;
+    var xOffset;
+    var x1, x2;
+    var adjustedX1, adjustedX2;
+    var x1Index, x2Index;
+    var searchString = data.search_info.search_string;
+    var startTime;
+    var endTime;
+
+    if (!isSelecting) {
+      selectionX = currentX;
+      var htmlSelection = '<div id="selection"></div>';
+      $('#visualization-container').prepend(htmlSelection);
+      $('#selection').css('left', selectionX + 'px');
+      isSelecting = true;
+    } else {
+
+      // Extract data for search, cancel selection state, and run new search
+      x1 = selectionX;
+      x2 = currentX;
+      if (x2 < x1) {
+        var tmp = x1;
+        x1 = x2;
+        x2 = tmp;
+      }
+      cancelSelectionOnVisualization();
+
+      console.log('selection: x1=' + x1 + ', x2=' + x2);
+      var canvasWidth = $('#threejs > canvas').outerWidth(true);
+      console.log('canvasWidth: ', canvasWidth);
+
+      xOffset = (canvasWidth - widthOfGraph) / 2;
+      adjustedX1 = x1 - xOffset;
+      adjustedX2 = x2 - xOffset;
+      x1Index = convertToArrayIndex(adjustedX1 / pixelsPerArticleCount, articleCountArraySize);
+      x2Index = convertToArrayIndex(adjustedX2 / pixelsPerArticleCount, articleCountArraySize);
+
+      console.log('adjustedX1=' + adjustedX1 + ', adjustedX2=' + adjustedX2);
+      console.log('x1Index=' + x1Index + ', x2Index=' + x2Index);
+
+      // New search
+      startTime = articleCountArray[x1Index].start_time;
+      endTime = articleCountArray[x2Index].end_time;
+      console.log('search_string: ' + searchString + ', start_time: ' + startTime + ', end_time: ' + endTime);
+      newSearch(searchString, startTime, endTime);
+    }
+  });
+
+  //
+  // Helper function: converts first argument to array index within 0 and the second argument
+  //
+  function convertToArrayIndex(decimalNumberToConvert, arraySize) {
+    var result = Math.floor(decimalNumberToConvert);
+    if (result < 0) {
+      result = 0;
+    } else if (result > (arraySize - 1)) {
+      result = arraySize - 1;
+    }
+    return result;
+  }
+
+  //
+  // Handle event: mouse move on 3D visualization
+  //
+  $('#visualization-container').on('mousemove', function(eventObject) {
+    if (isSelecting) {
+      var currentX = (eventObject.pageX - $(this).offset().left);
+      if (currentX >= selectionX) {
+        setSelectionBounds(selectionX, currentX);
+      } else {
+        setSelectionBounds(currentX, selectionX);
+      }
+    }
+  });
+
+  //
+  // Helper function: sets selection div based on left and right x coords. x2 must be greater than or equal to x1.
+  //
+  function setSelectionBounds(x1, x2) {
+      $('#selection').css('left', x1 + 'px');
+      var width = x2 - x1;
+      if (width === 0) {
+        width = 1;
+      }
+      $('#selection').css('width', width + 'px');
+  }
+
+  //
+  // Handle event: mouse leave on 3D visualization cancels selection state
+  //
+  $('#visualization-container').on('mouseleave', function(eventObject) {
+    if (isSelecting) {
+      cancelSelectionOnVisualization();
+    }
+  });
+
+  //
+  // Handle event: escape key on 3D visualization cancels selection state
+  //
+  $(document).on('keydown', function(eventObject) {
+    if (eventObject.keyCode === 27) {
+      if (isSelecting) {
+        cancelSelectionOnVisualization();
+      }
+    }
+  });
+
+  //
+  // Helper function: cancels selection state by removing selection div and resetting isSelecting to false
+  //
+  function cancelSelectionOnVisualization() {
+    $('#selection').remove();
+    isSelecting = false;
+  }
 
   //
   // View: display timeline described by the data object

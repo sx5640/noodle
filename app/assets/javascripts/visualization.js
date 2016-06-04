@@ -24,8 +24,10 @@ var visualization = (function() {
       visualizationRendered = false;
 
       // Query container element for dimensions to set our Three.js canvas to
-      width = $( '#visualization-container' ).width();
-      height = $( '#visualization-container' ).height();
+      width = $( '#threejs' ).width();
+      height = $( '#threejs' ).height();
+
+      console.log('Three.js setting width: ' + width + ', height: ' + height);
 
       // Initialize Three.js
       scene = new THREE.Scene();
@@ -37,9 +39,9 @@ var visualization = (function() {
       renderer.shadowMapSoft = true;
 
       // Set camera's z position
-      camera.position.z = 2500;
-      camera.position.y = 1500;
-      camera.rotation.x = -.35;
+      camera.position.z = 2800;
+      camera.position.y = 1250;
+      camera.rotation.x = -.20;
 
       // Create ground plane
       var groundMaterial = new THREE.MeshPhongMaterial({
@@ -56,7 +58,7 @@ var visualization = (function() {
       scene.add(ambientLight);
 
       directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-      directionalLight.position.set(500, 1000, 250);
+      directionalLight.position.set(-500, 1000, 250);
       directionalLight.position.multiplyScalar(1.3);
       directionalLight.castShadow = true;
       directionalLight.shadowCameraVisible = true;
@@ -72,8 +74,8 @@ var visualization = (function() {
       scene.add(directionalLight);
 
       // Attach Three.js canvas to container element
-      $( '#visualization-container' ).empty();
-      $( '#visualization-container' ).append( renderer.domElement );
+      $( '#threejs' ).empty();
+      $( '#threejs' ).append( renderer.domElement );
 
       // Define render callback animation function and pass it to requestAnimationFrame()
       var animationFrameCounter = 1;
@@ -128,11 +130,12 @@ var visualization = (function() {
 
       // Create one cube object for each zone (even empty zones) and add them to the scene
       var numZones = zones.length;
+      console.log('numZones: ', numZones);
       for (var i = 0; i < numZones; i++) {
         if (zones[i].count > 0) {
           var spacing = 16;
           var zone = zones[i];
-          var verticalSize = 5 + zone.count * 80;
+          var verticalSize = 5 + zone.count * 120;
           var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
           var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
           var cube = new THREE.Mesh( boxGeometry, boxMaterial );
@@ -140,8 +143,8 @@ var visualization = (function() {
           cube.castShadow = true;
           cube.receiveShadow = true;
           cube.scale.setX(xScale);
-          cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
-          cube.material.opacity = .2 + verticalSize/500;
+          cube.position.set( (i - numZones/2) * spacing, verticalSize/2, 0 );
+          cube.material.opacity = verticalSize/500;
           boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
           scene.add( cube );
         }
