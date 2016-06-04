@@ -127,8 +127,12 @@ class Keyword < ActiveRecord::Base
   end
   # define a method that remove generic keywords from keyword list of each zone
   def self.remove_generic_keywords(zones)
-    top_num = 5
-    allowed_generic_level = zones.length / 3
+    top_num = 9
+    if zones.length <= 1
+      allowed_generic_level = zones.length
+    else
+      allowed_generic_level = zones.length / 2
+    end
 
     # get top 20 keywords from each zone, put together and select by how many times they appear in all zones
     all_keywords = []
@@ -136,14 +140,16 @@ class Keyword < ActiveRecord::Base
       all_keywords += zone[:keywords][0..top_num].map { |e| e[:keyword]  }
     end
 
-    uniq_all_keywords = all_keywords.uniq
+    uniq_all_keywords = all_keywords.uniq.sort
 
+    puts "============= Top #{top_num+1} Keywords ==============="
     puts "all_keywords size: #{all_keywords.size}"
     uniq_all_keywords.each { |e|  puts "#{e}: #{all_keywords.count(e)}"}
     puts "============================"
 
     generic_keywords = uniq_all_keywords.select { |e| all_keywords.count(e) > allowed_generic_level }
 
+    puts "============= Generic Keywords ==============="
     generic_keywords.each { |e|  puts "#{e}: #{all_keywords.count(e)}"}
     puts "============================"
 

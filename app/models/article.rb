@@ -7,7 +7,7 @@ class Article < ActiveRecord::Base
 
   extend ArticleMixins::Zone
   # defining a method dedicated to get articles from NYTimes
-  def self.create_articles(entry)
+  def self.create_nytimes_articles(entry)
       # select data from each article where the JSON attributes has the same name with out Article class object.
       # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
     unless self.find_by(web_url: entry['web_url'])
@@ -55,11 +55,11 @@ class Article < ActiveRecord::Base
         num_of_threads.times do |t|
           threads[t] = Thread.new do
             if response["response"]["docs"][t]
-              self.create_articles(response["response"]["docs"][t])
+              self.create_nytimes_articles(response["response"]["docs"][t])
               if response["response"]["docs"][t+4]
-                self.create_articles(response["response"]["docs"][t+4])
+                self.create_nytimes_articles(response["response"]["docs"][t+4])
                 if response["response"]["docs"][t+8]
-                  self.create_articles(response["response"]["docs"][t+8])
+                  self.create_nytimes_articles(response["response"]["docs"][t+8])
                 end
               end
             end
@@ -230,7 +230,7 @@ class Article < ActiveRecord::Base
     puts(begin_date)
     puts(end_date)
 
-    step = 2.week
+    step = ((end_date - begin_date) / 1.year + 1).to_i.day
 
     i = 0
     if File.exist?("python/#{permitted_params[:search]}_2week.txt")

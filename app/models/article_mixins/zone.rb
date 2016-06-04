@@ -61,14 +61,14 @@ module ArticleMixins::Zone
     top_value = top_time_unit[:count]
     top_index = data_temp.index(top_time_unit)
 
-    step = 4
-    min_peak_multiplier = 4
+    step = 2
+    min_peak_multiplier = 3
 
     # this is the recursive condition: if the peak has value greater than n times of the average, it will generate a hot zone
     if top_value > min_peak_multiplier * data_average
 
       # call the move_boundary method to get the boundary of the top peak
-      start_index = top_index
+      start_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, -step/2, step)
       end_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, step, step)
       # save the result
       zones << {
@@ -124,6 +124,7 @@ module ArticleMixins::Zone
 
   def divide_into_zones_from_peak(articles, params)
     zones = self.create_zone_from_peak(params)
+    puts zones
     for i in (0 .. (zones.length - 1))
       zones[i][:article_list] = articles.select { |article|
         article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]
