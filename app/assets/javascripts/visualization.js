@@ -24,8 +24,10 @@ var visualization = (function() {
       visualizationRendered = false;
 
       // Query container element for dimensions to set our Three.js canvas to
-      width = $( '#visualization-container' ).width();
-      height = $( '#visualization-container' ).height();
+      width = $( '#threejs' ).width();
+      height = $( '#threejs' ).height();
+
+      console.log('Three.js setting width: ' + width + ', height: ' + height);
 
       // Initialize Three.js
       scene = new THREE.Scene();
@@ -56,7 +58,7 @@ var visualization = (function() {
       scene.add(ambientLight);
 
       directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-      directionalLight.position.set(500, 1000, 250);
+      directionalLight.position.set(-500, 1000, 250);
       directionalLight.position.multiplyScalar(1.3);
       directionalLight.castShadow = true;
       directionalLight.shadowCameraVisible = true;
@@ -128,6 +130,7 @@ var visualization = (function() {
 
       // Create one cube object for each zone (even empty zones) and add them to the scene
       var numZones = zones.length;
+      console.log('numZones: ', numZones);
       for (var i = 0; i < numZones; i++) {
         if (zones[i].count > 0) {
           var spacing = 16;
@@ -140,7 +143,7 @@ var visualization = (function() {
           cube.castShadow = true;
           cube.receiveShadow = true;
           cube.scale.setX(xScale);
-          cube.position.set( (numZones/2 - i) * spacing, verticalSize/2, 0 );
+          cube.position.set( (i - numZones/2) * spacing, verticalSize/2, 0 );
           cube.material.opacity = verticalSize/500;
           boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
           scene.add( cube );

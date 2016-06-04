@@ -173,6 +173,8 @@ $(document).on('ready page:load', function() {
   $('#timeline-nav').on('click', function(eventObject) {
     eventObject.preventDefault();
 
+    var data;
+
     // Remove current view
     $('#content-container').empty();
 
@@ -256,6 +258,19 @@ $(document).on('ready page:load', function() {
   //
   $('#visualization-container').on('click', function(eventObject) {
     var currentX = (eventObject.pageX - $(this).offset().left);
+    var data = global_data[global_data.length - 1];
+    var articleCountArray = data['article_count'];
+    var articleCountArraySize = articleCountArray.length;
+    var pixelsPerArticleCount = 2.672672672672672;
+    var widthOfGraph = articleCountArraySize * pixelsPerArticleCount;
+    var xOffset;
+    var x1, x2;
+    var adjustedX1, adjustedX2;
+    var x1Index, x2Index;
+    var searchString = data.search_info.search_string;
+    var startTime;
+    var endTime;
+
     if (!isSelecting) {
       selectionX = currentX;
       var htmlSelection = '<div id="selection"></div>';
@@ -265,8 +280,8 @@ $(document).on('ready page:load', function() {
     } else {
 
       // Extract data for search, cancel selection state, and run new search
-      var x1 = selectionX;
-      var x2 = currentX;
+      x1 = selectionX;
+      x2 = currentX;
       if (x2 < x1) {
         var tmp = x1;
         x1 = x2;
@@ -274,9 +289,39 @@ $(document).on('ready page:load', function() {
       }
       cancelSelectionOnVisualization();
 
-      console.log('new search: x1=' + x1 + ', x2=' + x2);
+      console.log('selection: x1=' + x1 + ', x2=' + x2);
+      var canvasWidth = $('#threejs > canvas').outerWidth(true);
+      console.log('canvasWidth: ', canvasWidth);
+
+      xOffset = (canvasWidth - widthOfGraph) / 2;
+      adjustedX1 = x1 - xOffset;
+      adjustedX2 = x2 - xOffset;
+      x1Index = convertToArrayIndex(adjustedX1 / pixelsPerArticleCount, articleCountArraySize);
+      x2Index = convertToArrayIndex(adjustedX2 / pixelsPerArticleCount, articleCountArraySize);
+
+      console.log('adjustedX1=' + adjustedX1 + ', adjustedX2=' + adjustedX2);
+      console.log('x1Index=' + x1Index + ', x2Index=' + x2Index);
+
+      // New search
+      startTime = articleCountArray[x1Index].start_time;
+      endTime = articleCountArray[x2Index].end_time;
+      console.log('search_string: ' + searchString + ', start_time: ' + startTime + ', end_time: ' + endTime);
+      newSearch(searchString, startTime, endTime);
     }
   });
+
+  //
+  // Helper function: converts first argument to array index within 0 and the second argument
+  //
+  function convertToArrayIndex(decimalNumberToConvert, arraySize) {
+    var result = Math.floor(decimalNumberToConvert);
+    if (result < 0) {
+      result = 0;
+    } else if (result > (arraySize - 1)) {
+      result = arraySize - 1;
+    }
+    return result;
+  }
 
   //
   // Handle event: mouse move on 3D visualization
