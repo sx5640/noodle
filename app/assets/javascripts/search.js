@@ -306,7 +306,7 @@ $(document).on('ready page:load', function() {
       startTime = articleCountArray[x1Index].start_time;
       endTime = articleCountArray[x2Index].end_time;
       console.log('search_string: ' + searchString + ', start_time: ' + startTime + ', end_time: ' + endTime);
-      newSearch(searchString, startTime, endTime);
+      subSearch(searchString, startTime, endTime);
     }
   });
 
