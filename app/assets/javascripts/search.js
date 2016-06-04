@@ -12,9 +12,10 @@ $(document).on('ready page:load', function() {
   visualization.init();
 
   //
-  // 3D visualization selection state
+  // 3D visualization selection state variables
   //
   var isSelecting = false;
+  var selectionX; // x offset of initial mouse click that creates selection
 
   //
   // Get saved timeline, populated by the user profile
@@ -266,30 +267,85 @@ $(document).on('ready page:load', function() {
   });
 
   //
-  // Handle event: mouse move on 3D visualization
+  // Handle event: click on 3D visualization
   //
-  $('#visualization-container').on('mousemove', function(eventObject) {
-    if (isSelecting) {
-      var x = (eventObject.pageX - $(this).offset().left);
-      var width = x - $('#selection').position().left;
-      $('#selection').css('width', width + 'px');
+  $('#visualization-container').on('click', function(eventObject) {
+    var currentX = (eventObject.pageX - $(this).offset().left);
+    if (!isSelecting) {
+      selectionX = currentX;
+      var htmlSelection = '<div id="selection"></div>';
+      $('#visualization-container').prepend(htmlSelection);
+      $('#selection').css('left', selectionX + 'px');
+      isSelecting = true;
+    } else {
+
+      // Extract data for search, cancel selection state, and run new search
+      var x1 = selectionX;
+      var x2 = currentX;
+      if (x2 < x1) {
+        var tmp = x1;
+        x1 = x2;
+        x2 = tmp;
+      }
+      cancelSelectionOnVisualization();
+
+      console.log('new search: x1=' + x1 + ', x2=' + x2);
     }
   });
 
   //
-  // Handle event: click on 3D visualization
+  // Handle event: mouse move on 3D visualization
   //
-  $('#visualization-container').on('click', function(eventObject) {
-    if (!isSelecting) {
-      var x = (eventObject.pageX - $(this).offset().left);
-      var htmlSelection = '<div id="selection"></div>';
-      $('#visualization-container').prepend(htmlSelection);
-      $('#selection').css('left', x + 'px');
-      isSelecting = true;
-    } else {
-      isSelecting = false;
+  $('#visualization-container').on('mousemove', function(eventObject) {
+    if (isSelecting) {
+      var currentX = (eventObject.pageX - $(this).offset().left);
+      if (currentX >= selectionX) {
+        setSelectionBounds(selectionX, currentX);
+      } else {
+        setSelectionBounds(currentX, selectionX);
+      }
     }
   });
+
+  //
+  // Helper function: sets selection div based on left and right x coords. x2 must be greater than or equal to x1.
+  //
+  function setSelectionBounds(x1, x2) {
+      $('#selection').css('left', x1 + 'px');
+      var width = x2 - x1;
+      if (width === 0) {
+        width = 1;
+      }
+      $('#selection').css('width', width + 'px');
+  }
+
+  //
+  // Handle event: mouse leave on 3D visualization cancels selection state
+  //
+  $('#visualization-container').on('mouseleave', function(eventObject) {
+    if (isSelecting) {
+      cancelSelectionOnVisualization();
+    }
+  });
+
+  //
+  // Handle event: escape key on 3D visualization cancels selection state
+  //
+  $(document).on('keydown', function(eventObject) {
+    if (eventObject.keyCode === 27) {
+      if (isSelecting) {
+        cancelSelectionOnVisualization();
+      }
+    }
+  });
+
+  //
+  // Helper function: cancels selection state by removing selection div and resetting isSelecting to false
+  //
+  function cancelSelectionOnVisualization() {
+    $('#selection').remove();
+    isSelecting = false;
+  }
 
   //
   // View: display timeline described by the data object
