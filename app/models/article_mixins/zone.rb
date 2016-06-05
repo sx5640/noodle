@@ -138,11 +138,36 @@ module ArticleMixins::Zone
     end
     zones = Keyword.remove_generic_keywords(zones)
     zones = calculate_hotness(zones)
+    zones = pick_most_relevant_articles(zones)
     return zones
   end
 
   def pick_most_relevant_articles(zones)
+    zones.each do |zone|
+      top_num = 9
+      top_keywords = zone[:keywords][0..top_num].map { |e| e[:keyword] }
 
+      zone_relevance = {}
+
+      zone[:article_list].each do |article|
+        zone_relevance[article] = 0
+        article.keyword_analyses.each do |keyword_analysis|
+          if top_keywords.include?(keyword_analysis.keyword[:name])
+            zone_relevance[article] += keyword_analysis[:relevance]
+          end
+        end
+      end
+      zone[:article_list].sort! {|a,b|
+        zone_relevance[b] <=> zone_relevance[a]
+      }
+      zone[:article_list].each do |article|
+        article = {
+          article: article,
+          zone_relevance: zone_relevance[article]
+        }
+      end
+    end
+    return zones
   end
 
   #define a function that cut the selected time period into 20 zones with equal length. the function will return an array of zones, each as a hash, with start_time, end_time, list of articles within the time zone, count of articles within the zone, and 'hotness' of the zone
