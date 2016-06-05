@@ -66,7 +66,7 @@ module ArticleMixins::Zone
     top_index = data_temp.index(top_time_unit)
 
     step = 2
-    min_peak_multiplier = 3
+    min_peak_multiplier = 4
 
     # this is the recursive condition: if the peak has value greater than n times of the average, it will generate a hot zone
     if top_value > min_peak_multiplier * data_average
@@ -77,6 +77,7 @@ module ArticleMixins::Zone
       # save the result
       zones << {
         start_time: data_temp[start_index][:start_time], end_time: data_temp[end_index][:end_time],
+        peak_time: data_temp[top_index],
         top_value: top_value
       }
 
@@ -145,27 +146,28 @@ module ArticleMixins::Zone
   def pick_most_relevant_articles(zones)
     zones.each do |zone|
       top_num = 9
+      peak_time = zone[:peak_time]
       top_keywords = zone[:keywords][0..top_num].map { |e| e[:keyword] }
 
       zone_relevance = {}
 
       zone[:article_list].each do |article|
-        zone_relevance[article] = 0
-        article.keyword_analyses.each do |keyword_analysis|
-          if top_keywords.include?(keyword_analysis.keyword[:name])
-            zone_relevance[article] += keyword_analysis[:relevance]
+        days_to_peak = (article[:publication_time] - peak_time[:start_time]) / 1.day
+
+        zone_relevance[article[:title]] = 0
+        if days_to_peak >= 0
+          article.keyword_analyses.each do |keyword_analysis|
+            if top_keywords.include?(keyword_analysis.keyword[:name])
+              zone_relevance[article[:title]] += keyword_analysis[:relevance] / (days_to_peak + 4)
+            end
           end
         end
       end
       zone[:article_list].sort! {|a,b|
-        zone_relevance[b] <=> zone_relevance[a]
+        zone_relevance[b[:title]] <=> zone_relevance[a[:title]]
       }
-      zone[:article_list].each do |article|
-        article = {
-          article: article,
-          zone_relevance: zone_relevance[article]
-        }
-      end
+
+      zone[:article_relevance] = zone_relevance
     end
     return zones
   end

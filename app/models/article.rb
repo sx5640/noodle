@@ -156,13 +156,15 @@ class Article < ActiveRecord::Base
     search_items = permitted_params[:search].split("|")
 
     selected_articles = []
+    min_relevance = 0.5
     # search in database with keywords.the \y regex means word boundary
     search_items.each do |search_item|
       if permitted_params[:start_time] && permitted_params[:end_time]
-        keyword_search_result = self.joins(:keywords).where("
-          articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ~* ?",
+        keyword_search_result = self.joins(:keywords, :keyword_analyses).where("
+          articles.publication_time >= ? AND articles.publication_time <= ? AND keywords.name ~* ? AND keyword_analyses.relevance >= ?",
           permitted_params[:start_time], permitted_params[:end_time],
-          '\y' + "#{search_item}" + '\y'
+          '\y' + "#{search_item}" + '\y',
+          min_relevance
         ).order(:publication_time)
 
         title_search_result = self.where(
@@ -193,9 +195,9 @@ class Article < ActiveRecord::Base
 
       else
         # if timeframe not given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword from all time
-        keyword_search_result = self.joins(:keywords).where(
-          "keywords.name ~* ?",
-          '\y' + "#{search_item}" + '\y'
+        keyword_search_result = self.joins(:keywords, :keyword_analyses).where("keywords.name ~* ? AND keyword_analyses.relevance >= ?",
+          '\y' + "#{search_item}" + '\y',
+          min_relevance
         ).order(:publication_time)
 
         title_search_result = self.where(
@@ -316,7 +318,7 @@ class Article < ActiveRecord::Base
   private
   def self.threading(data, num_of_threads, start_num)
     if start_num < 10 && data[start_num]
-      
+
       self.create_guardian_articles(data[start_num])
 
       threading(data, num_of_threads, start_num + num_of_threads)
