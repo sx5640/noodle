@@ -6,6 +6,8 @@ class Article < ActiveRecord::Base
   has_many :saved_timelines
 
   extend ArticleMixins::Zone
+########## Database Construction ##########
+  ########## NYTimes ##########
   # defining a method dedicated to get articles from NYTimes
   def self.create_nytimes_articles(entry)
       # select data from each article where the JSON attributes has the same name with out Article class object.
@@ -91,6 +93,64 @@ class Article < ActiveRecord::Base
     end
   end
 
+  ########## Guardian ##########
+  def self.create_guardian_articles(entry)
+    # select data from each article where the JSON attributes has the same name with out Article class object.
+    # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
+    unless self.find_by(web_url: entry['webUrl'])
+      data = {
+        title: entry['webTitle'],
+        publication_time: entry['webPublicationDate'].to_datetime,
+        section: entry['sectionName'],
+        web_url: entry['webUrl']
+      }
+
+      article = self.new(data)
+      # save int database
+      article.save
+
+      # now keywords
+      Keyword.get_text_razor_keywords(article)
+      # Keyword.get_nytimes_keywords(entry, article)
+    end
+  end
+
+  def self.get_guardian_articles(search_terms, begin_date)
+    articles = []
+    search_terms = search_terms.split(" ").join("%20")
+    # loop through page 0 to page 100
+    for i in (1 .. 100)
+      # get 10 articles with given keyword, timeframe and page #
+      response = JSON.parse(
+      Typhoeus.get("http://content.guardianapis.com/search?q=#{search_terms}&page=#{i}&from-date=#{begin_date}&api-key=#{Rails.application.secrets.guardian_key}").body)
+      puts(i)
+      # if no article returns, break the loop
+      if response["response"]["results"]
+
+        # iterate through the 10 articles get from each call, and clean up the data
+        articles << response["response"]["results"]
+
+        response["response"]["results"].each do |entry|
+          self.create_guardian_articles(entry)
+        end
+
+        # threads = []
+        # num_of_threads = 2
+        # num_of_threads.times do |t|
+        #   threads[t] = Thread.new do
+        #     self.threading(response["response"]["results"], num_of_threads, t)
+        #   end
+        # end
+        # threads.each {|t| t.join}
+
+      else
+        break
+      end
+    end
+    return articles
+  end
+
+########## Article Analysis ##########
   def self.select_articles_from_database(permitted_params)
     # if timeframe given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword within the timeframe.
     search_items = permitted_params[:search].split("|")
@@ -204,8 +264,8 @@ class Article < ActiveRecord::Base
         keywords: Article.generate_keywords(articles),
         search_info: {
           search_string: permitted_params[:search],
-          start_time: articles.last.publication_time,
-          end_time: articles.first.publication_time
+          start_time: articles.first.publication_time,
+          end_time: articles.last.publication_time
         }
       }
       puts"in zones: #{result[:zones].inject(0) {|sum, zone| sum + zone[:count]}}"
@@ -220,6 +280,7 @@ class Article < ActiveRecord::Base
     return result
   end
 
+########## Transfer data to Python ##########
   # this is a method that used to write article_count into txt file, then read by python script
   def self.write_txt(permitted_params)
     articles = Article.select_articles_from_database(permitted_params).sort { |a, b| b.publication_time <=> a.publication_time }
@@ -250,63 +311,6 @@ class Article < ActiveRecord::Base
       sum += sprintf("%03d", articles_in_unit.length).to_i
     end
     puts(sum)
-  end
-
-
-  def self.create_guardian_articles(entry)
-      # select data from each article where the JSON attributes has the same name with out Article class object.
-      # everything from the JSON taht is not selected cannot be saved directly into database and needed clean up
-    unless self.find_by(web_url: entry['webUrl'])
-      data = {
-        title: entry['webTitle'],
-        publication_time: entry['webPublicationDate'].to_datetime,
-        section: entry['sectionName'],
-        web_url: entry['webUrl']
-      }
-
-      article = self.new(data)
-      # save int database
-      article.save
-
-      # now keywords
-      Keyword.get_text_razor_keywords(article)
-      # Keyword.get_nytimes_keywords(entry, article)
-    end
-  end
-
-  def self.get_guardian_articles(search_terms, begin_date)
-    articles = []
-    search_terms = search_terms.split(" ").join("%20")
-    # loop through page 0 to page 100
-    for i in (1 .. 100)
-      # get 10 articles with given keyword, timeframe and page #
-      response = JSON.parse(
-      Typhoeus.get("http://content.guardianapis.com/search?q=#{search_terms}&page=#{i}&from-date=#{begin_date}&api-key=#{Rails.application.secrets.guardian_key}").body)
-      puts(i)
-      # if no article returns, break the loop
-      if response["response"]["results"]
-
-        # iterate through the 10 articles get from each call, and clean up the data
-        articles << response["response"]["results"]
-
-        response["response"]["results"].each do |entry|
-          self.create_guardian_articles(entry)
-        end
-
-        # threads = []
-        # num_of_threads = 2
-        # num_of_threads.times do |t|
-        #   threads[t] = Thread.new do
-        #     self.threading(response["response"]["results"], num_of_threads, t)
-        #   end
-        # end
-        # threads.each {|t| t.join}
-
-      else
-        break
-      end
-    end
-    return articles
   end
 
   private

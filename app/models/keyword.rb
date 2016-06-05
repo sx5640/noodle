@@ -104,7 +104,11 @@ class Keyword < ActiveRecord::Base
         if existing_keyword
           new_keyword_analysis = article.keyword_analyses.new
           new_keyword_analysis.keyword = existing_keyword
-          # calculate relevance based on the ranking of the keyword given by NYTimes
+
+          if keyword['confidenceScore']
+            new_keyword_analysis[:confidence] = keyword['confidenceScore'].to_f
+          end
+
           if keyword['relevanceScore']
             new_keyword_analysis[:relevance] = keyword['relevanceScore'].to_f
           else
@@ -115,6 +119,11 @@ class Keyword < ActiveRecord::Base
           new_keyword = self.create(name: keyword['entityId'])
           new_keyword_analysis = article.keyword_analyses.new
           new_keyword_analysis.keyword = new_keyword
+
+          if keyword['confidenceScore']
+            new_keyword_analysis[:confidence] = keyword['confidenceScore'].to_f
+          end
+
           if keyword['relevanceScore'].to_f
             new_keyword_analysis[:relevance] = keyword['relevanceScore'].to_f
           else
