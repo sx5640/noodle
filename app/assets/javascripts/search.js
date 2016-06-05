@@ -181,12 +181,15 @@ $(document).on('ready page:load', function() {
     // Pop the saved dom tree for current view
     global_views.pop();
     global_data.pop();
+    data = global_data[global_data.length - 1];
 
     // Add the previous view (now the last view in the view stack) to the live dom, displaying it
     $('#content-container').html(global_views[global_views.length - 1]);
 
+    // Re-render keywords for entire timeline
+    timeline.replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
+
     // Re-render 3D visualization to reflect the current timeline view
-    data = global_data[global_data.length - 1];
     visualization.render(data['article_count']);
 
     // Re-render the minimap to reflect the current timeline view
