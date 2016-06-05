@@ -4,6 +4,11 @@
   Applying a few base style rules to make the page look a little nicer.
 */
 
+html {
+  overflow: -moz-scrollbars-vertical;
+  overflow-y: scroll;
+}
+
 body {
   font-family: 'Fira Sans', Helvetica, Arial, sans-serif;
   font-size: 16px;

@@ -55,6 +55,11 @@ $(document).on('ready page:load', function() {
     else {
       var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string;
     }
+
+    // Before making search AJAX call, hide all content and display activity indicator
+    hideAllContent();
+    showSearchActivityIndicator();
+
     $.ajax({
       url: url,
       type: 'GET',
@@ -73,6 +78,10 @@ $(document).on('ready page:load', function() {
         // Build timeline, display it and push it onto stack along with its data
         displayTimelineView(data);
 
+        // Unhide all the content
+        hideSearchActivityIndicator();
+        showAllContent();
+
         // Render 3D visualization
         visualization.render(data['article_count']);
 
@@ -81,6 +90,46 @@ $(document).on('ready page:load', function() {
         updateMinimap();
       }
     });
+  }
+
+  //
+  // Helper function: hide all content
+  //
+  function hideAllContent() {
+    $('#keywords-container').hide();
+    $('#visualization-container').hide();
+    $('#timeline-nav').hide();
+    $('#content-container').hide();
+    $('#minimap-container').hide();
+  }
+
+  //
+  // Helper function: show all content
+  //
+  function showAllContent() {
+    $('#keywords-container').show();
+    $('#visualization-container').show();
+    $('#timeline-nav').show();
+    $('#content-container').show();
+    $('#minimap-container').show();
+  }
+
+  //
+  // Helper function: show search activity indicator
+  //
+  function showSearchActivityIndicator() {
+    var htmlActivityIndicator = '<div id="search-indicator-circle"></div>';
+    $('#search-indicator-container').html(htmlActivityIndicator);
+    $('#search-indicator-circle').addClass('pulse');
+    visualization.pause(); // pause visualization so that it doesn't affect css animation performance
+  }
+
+  //
+  // Helper function: show search activity indicator
+  //
+  function hideSearchActivityIndicator() {
+    $('#search-indicator-container').empty();
+    visualization.unpause();
   }
 
   //
@@ -181,12 +230,15 @@ $(document).on('ready page:load', function() {
     // Pop the saved dom tree for current view
     global_views.pop();
     global_data.pop();
+    data = global_data[global_data.length - 1];
 
     // Add the previous view (now the last view in the view stack) to the live dom, displaying it
     $('#content-container').html(global_views[global_views.length - 1]);
 
+    // Re-render keywords for entire timeline
+    timeline.replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
+
     // Re-render 3D visualization to reflect the current timeline view
-    data = global_data[global_data.length - 1];
     visualization.render(data['article_count']);
 
     // Re-render the minimap to reflect the current timeline view
@@ -306,7 +358,7 @@ $(document).on('ready page:load', function() {
       startTime = articleCountArray[x1Index].start_time;
       endTime = articleCountArray[x2Index].end_time;
       console.log('search_string: ' + searchString + ', start_time: ' + startTime + ', end_time: ' + endTime);
-      newSearch(searchString, startTime, endTime);
+      subSearch(searchString, startTime, endTime);
     }
   });
 
