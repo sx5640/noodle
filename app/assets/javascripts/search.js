@@ -145,7 +145,7 @@ $(document).on('ready page:load', function() {
   // Helper function: show 'no search results' message
   //
   function showNoSearchResults() {
-    var htmlNoSearchResults = '<div id="search-results">Search returned no results</div>';
+    var htmlNoSearchResults = '<div id="search-results">No Search Results</div>';
     $('#search-indicator-container').html(htmlNoSearchResults);
   }
 
