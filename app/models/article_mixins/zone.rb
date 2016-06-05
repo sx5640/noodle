@@ -54,7 +54,11 @@ module ArticleMixins::Zone
     data_not_zoned = params_temp[:data_not_zoned]
     first_difference = params_temp[:first_difference]
     data_size = params_temp[:data_size]
-    data_average = params_temp[:data_average]
+    if data_size < 5
+      data_average = 0
+    else
+      data_average = params_temp[:data_average]
+    end
     zones = []
 
     top_time_unit = data_temp.max {|a, b| a[:count] <=> b[:count]}
@@ -135,6 +139,10 @@ module ArticleMixins::Zone
     zones = Keyword.remove_generic_keywords(zones)
     zones = calculate_hotness(zones)
     return zones
+  end
+
+  def pick_most_relevant_articles(zones)
+
   end
 
   #define a function that cut the selected time period into 20 zones with equal length. the function will return an array of zones, each as a hash, with start_time, end_time, list of articles within the time zone, count of articles within the zone, and 'hotness' of the zone
@@ -232,34 +240,36 @@ module ArticleMixins::Zone
   # defining a method that takes in a zone or a selection of articles and returns top keywords
   def calculate_hotness(zones)
     # find the max, min, average
-    temp = zones.inject([0,100000,0]) do |temp, zone|
-      zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
-      zone_average_count = zone[:count] / zone_size
+    unless zones.empty?
+      temp = zones.inject([0,100000,0]) do |temp, zone|
+        zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
+        zone_average_count = zone[:count] / zone_size
 
-      if temp[0] < zone_average_count
-        temp[0] = zone_average_count
+        if temp[0] < zone_average_count
+          temp[0] = zone_average_count
+        end
+        if temp[1] > zone_average_count
+          temp[1] = zone_average_count
+        end
+        temp[2] += zone_average_count
+        temp
       end
-      if temp[1] > zone_average_count
-        temp[1] = zone_average_count
-      end
-      temp[2] += zone_average_count
-      temp
-    end
-    hottest = temp[0]
-    coldest = temp[1]
-    total = temp[2]
-    average = total/zones.length
-    #calculate hotness based on the count of articles in the zone, comparing to average, max, min
-    zones.each do |zone|
-      zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
-      zone_average_count = zone[:count] / zone_size
+      hottest = temp[0]
+      coldest = temp[1]
+      total = temp[2]
+      average = total/zones.length
+      #calculate hotness based on the count of articles in the zone, comparing to average, max, min
+      zones.each do |zone|
+        zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
+        zone_average_count = zone[:count] / zone_size
 
-      if zone_average_count > average
-        zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
-      elsif zone_average_count < average
-        zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
-      elsif zone_average_count == average
-        zone[:hotness] = 5
+        if zone_average_count > average
+          zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
+        elsif zone_average_count < average
+          zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
+        elsif zone_average_count == average
+          zone[:hotness] = 5
+        end
       end
     end
     return zones

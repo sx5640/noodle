@@ -134,14 +134,14 @@ class Article < ActiveRecord::Base
           self.create_guardian_articles(entry)
         end
 
-        # threads = []
-        # num_of_threads = 2
-        # num_of_threads.times do |t|
-        #   threads[t] = Thread.new do
-        #     self.threading(response["response"]["results"], num_of_threads, t)
-        #   end
-        # end
-        # threads.each {|t| t.join}
+        threads = []
+        num_of_threads = 2
+        num_of_threads.times do |t|
+          threads[t] = Thread.new do
+            self.threading(response["response"]["results"], num_of_threads, t)
+          end
+        end
+        threads.each {|t| t.join}
 
       else
         break
@@ -316,7 +316,9 @@ class Article < ActiveRecord::Base
   private
   def self.threading(data, num_of_threads, start_num)
     if start_num < 10 && data[start_num]
+      
       self.create_guardian_articles(data[start_num])
+
       threading(data, num_of_threads, start_num + num_of_threads)
     end
   end
