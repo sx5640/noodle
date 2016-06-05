@@ -55,6 +55,11 @@ $(document).on('ready page:load', function() {
     else {
       var url = '/articles/search?utf8=%E2%9C%93&search=' + search_string;
     }
+
+    // Before making search AJAX call, hide all content and display activity indicator
+    hideAllContent();
+    showSearchActivityIndicator();
+
     $.ajax({
       url: url,
       type: 'GET',
@@ -73,6 +78,10 @@ $(document).on('ready page:load', function() {
         // Build timeline, display it and push it onto stack along with its data
         displayTimelineView(data);
 
+        // Unhide all the content
+        hideSearchActivityIndicator();
+        showAllContent();
+
         // Render 3D visualization
         visualization.render(data['article_count']);
 
@@ -81,6 +90,46 @@ $(document).on('ready page:load', function() {
         updateMinimap();
       }
     });
+  }
+
+  //
+  // Helper function: hide all content
+  //
+  function hideAllContent() {
+    $('#keywords-container').hide();
+    $('#visualization-container').hide();
+    $('#timeline-nav').hide();
+    $('#content-container').hide();
+    $('#minimap-container').hide();
+  }
+
+  //
+  // Helper function: show all content
+  //
+  function showAllContent() {
+    $('#keywords-container').show();
+    $('#visualization-container').show();
+    $('#timeline-nav').show();
+    $('#content-container').show();
+    $('#minimap-container').show();
+  }
+
+  //
+  // Helper function: show search activity indicator
+  //
+  function showSearchActivityIndicator() {
+    var htmlActivityIndicator = '<div id="search-indicator-circle"></div>';
+    $('#search-indicator-container').html(htmlActivityIndicator);
+    $('#search-indicator-circle').addClass('pulse');
+    visualization.pause(); // pause visualization so that it doesn't affect css animation performance
+  }
+
+  //
+  // Helper function: show search activity indicator
+  //
+  function hideSearchActivityIndicator() {
+    $('#search-indicator-container').empty();
+    visualization.unpause();
   }
 
   //

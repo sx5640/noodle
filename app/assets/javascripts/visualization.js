@@ -1,5 +1,6 @@
 var visualization = (function() {
 
+  var paused = true;
   var width;
   var height;
   var scene;
@@ -81,8 +82,9 @@ var visualization = (function() {
       var animationFrameCounter = 1;
       var animationFrameMax = 30;
       var render = function () {
-          requestID = requestAnimationFrame( render );
+        requestID = requestAnimationFrame( render );
 
+        if (!paused) {
           if (!visualizationRendered) {
             if (boxMeshes) {
               for (var i = 0; i < boxMeshes.length; i++) {
@@ -100,9 +102,11 @@ var visualization = (function() {
                 animationFrameCounter = 1;
               }
             }
+          } else {
+            paused = true;
           }
-
           renderer.render( scene, camera );
+        }
       };
 
       // Kick off the rendering process
@@ -115,6 +119,7 @@ var visualization = (function() {
     render: function(zones) {
       // Reset visualizationRendered flag so that it animates into view
       visualizationRendered = false;
+      paused = false;
 
       // Remove all previously added objects from the scene, other than camera
       for (let i = scene.children.length - 1; i >= 0 ; i--) {
@@ -149,6 +154,20 @@ var visualization = (function() {
           scene.add( cube );
         }
       }
+    },
+
+    //
+    // View: Pause render
+    //
+    pause: function() {
+      paused = true;
+    },
+
+    //
+    // View: Unpause render
+    //
+    unpause: function() {
+      paused = false;
     }
   }
 
