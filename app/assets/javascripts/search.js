@@ -277,6 +277,9 @@ $(document).on('ready page:load', function() {
     if(global_views.length === 1) {
       $('#timeline-nav').empty();
     }
+
+    // Set the document back to the top if going back from articles view
+    $(document).scrollTop(0);
   });
 
   //
