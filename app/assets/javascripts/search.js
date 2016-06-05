@@ -225,9 +225,17 @@ $(document).on('ready page:load', function() {
         minimap.render(null);
 
         // Scroll the document to the start of content
-        var documentHeight = $(document).height();
-        var articleListHeight = $('#content-container').outerHeight();
-        var headerHeight = documentHeight - articleListHeight + 60;
+        // var documentHeight = $(document).height();
+        // var articleListHeight = $('#content-container').outerHeight();
+        // var headerHeight = documentHeight - articleListHeight + 60;
+
+        // Hide visualization in articles view
+        $('#visualization-container').hide();
+
+        var navHeight = 60;
+        var searchHeight = $('#search-section').outerHeight();
+        var keywordsHeight = $('#keywords-container').outerHeight();
+        var headerHeight = navHeight + searchHeight + keywordsHeight;
         $(document).scrollTop(headerHeight);
       }
     }
@@ -254,6 +262,9 @@ $(document).on('ready page:load', function() {
 
     // Re-render keywords for entire timeline
     timeline.replaceKeywords(data['keywords'], 10, $('#top-keywords-list'), 'top-keywords');
+
+    // Make sure to show visualization again in case we're coming back up from an articles view where it has been hidden
+    $('#visualization-container').show();
 
     // Re-render 3D visualization to reflect the current timeline view
     visualization.render(data['article_count']);
