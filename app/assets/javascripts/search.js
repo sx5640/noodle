@@ -59,12 +59,22 @@ $(document).on('ready page:load', function() {
     // Before making search AJAX call, hide all content and display activity indicator
     hideAllContent();
     showSearchActivityIndicator();
+    visualization.pause(); // pause visualization so that it doesn't affect css animation performance
 
     $.ajax({
       url: url,
       type: 'GET',
       dataType: 'json',
       success: function(data) {
+
+        // Detect if search returned 0 results, and throw a message.
+        if (!data['article_count']) {
+          // Hide search activity indicator and display an error message
+          hideSearchActivityIndicator();
+          showNoSearchResults();
+          return;
+        }
+
         // Clear the view stack and corresponding data stack, and clear any timeline navigation still present
         if (is_sub_search) {
           var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
@@ -80,6 +90,7 @@ $(document).on('ready page:load', function() {
 
         // Unhide all the content
         hideSearchActivityIndicator();
+        visualization.unpause();
         showAllContent();
 
         // Render 3D visualization
@@ -121,7 +132,6 @@ $(document).on('ready page:load', function() {
     var htmlActivityIndicator = '<div id="search-indicator-circle"></div>';
     $('#search-indicator-container').html(htmlActivityIndicator);
     $('#search-indicator-circle').addClass('pulse');
-    visualization.pause(); // pause visualization so that it doesn't affect css animation performance
   }
 
   //
@@ -129,7 +139,14 @@ $(document).on('ready page:load', function() {
   //
   function hideSearchActivityIndicator() {
     $('#search-indicator-container').empty();
-    visualization.unpause();
+  }
+
+  //
+  // Helper function: show 'no search results' message
+  //
+  function showNoSearchResults() {
+    var htmlNoSearchResults = '<div id="search-results">No Search Results</div>';
+    $('#search-indicator-container').html(htmlNoSearchResults);
   }
 
   //
