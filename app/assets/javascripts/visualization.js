@@ -140,7 +140,7 @@ var visualization = (function() {
         if (zones[i].count > 0) {
           var spacing = 16;
           var zone = zones[i];
-          var verticalSize = 5 + zone.count * 120;
+          var verticalSize = 5 + zone.count * 240;
           var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
           var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
           var cube = new THREE.Mesh( boxGeometry, boxMaterial );
