@@ -12,6 +12,11 @@ $(document).on('ready page:load', function() {
   visualization.init();
 
   //
+  // Hide visualization
+  //
+  hideAllContent();
+
+  //
   // 3D visualization selection state variables
   //
   var isSelecting = false;
