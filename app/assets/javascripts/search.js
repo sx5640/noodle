@@ -114,6 +114,17 @@ $(document).on('ready page:load', function() {
   }
 
   //
+  // Handle event: close the autocomplete dropdown
+  //
+  $("#search").keypress(function(e){
+   if (!e) e = window.event;
+   if (e.keyCode == '13'){
+     $('#search').autocomplete('close');
+     return false;
+   }
+ });
+
+  //
   // Helper function: hide all content
   //
   function hideAllContent() {
