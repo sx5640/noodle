@@ -1,6 +1,8 @@
 module ArticleMixins::Zone
   # define a method that count the number of articles in each time unit. the unit is determined by the length of the selected time frame. if the selected articles spans a year, this method will return the number of articles per day; if the selected articles spans 2 years, this method will return the number of articles per 2 days
   def count_articles(articles)
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Count Articles *************"
+
     begin_date = articles.first.publication_time
     end_date = articles.last.publication_time
 
@@ -52,6 +54,7 @@ module ArticleMixins::Zone
   def create_zone_from_peak(params)
     # Initialize the function
       # deep copying the params
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Creating Zones *************"
     params_temp = Marshal.load(Marshal.dump(params))
     data_temp = params_temp[:data]
     data_not_zoned = params_temp[:data_not_zoned]
@@ -133,6 +136,8 @@ module ArticleMixins::Zone
   end
 
   def divide_into_zones_from_peak(articles, params)
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Working on Zones *************"
+
     zones = self.create_zone_from_peak(params)
     puts zones
     for i in (0 .. (zones.length - 1))
@@ -140,15 +145,17 @@ module ArticleMixins::Zone
         article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]
       }
       zones[i][:count] = zones[i][:article_list].size
-      zones[i][:keywords] = generate_keywords(zones[i][:article_list])
+      zones[i][:keywords] = Keyword.generate_keywords(zones[i][:article_list])
     end
     zones = Keyword.remove_generic_keywords(zones)
     zones = calculate_hotness(zones)
     zones = pick_most_relevant_articles(zones)
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* End of Zones *************"
     return zones
   end
 
   def pick_most_relevant_articles(zones)
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Rank Top Articles *************"
     zones.each do |zone|
       top_num = 9
       peak_time = zone[:peak_time]
@@ -191,7 +198,7 @@ module ArticleMixins::Zone
       zones[i][:article_list] = articles.select { |article|
                   article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]}
       zones[i][:count] = zones[i][:article_list].size
-      zones[i][:keywords] = generate_keywords(zones[i][:article_list])
+      zones[i][:keywords] = Keyword.generate_keywords(zones[i][:article_list])
     end
     zones = self.calculate_hotness(zones)
     return zones
@@ -269,6 +276,7 @@ module ArticleMixins::Zone
   # defining a function that can calculate "hottest" of a zone, based on the number of articles it has comparing to the average, and to the max and min
   # defining a method that takes in a zone or a selection of articles and returns top keywords
   def calculate_hotness(zones)
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Calculating Hotness *************"
     # find the max, min, average
     unless zones.empty?
       count_array = zones.map {|e| e[:top_value]}

@@ -12,7 +12,7 @@ class Keyword < ActiveRecord::Base
         # if the keyword exists, create a new_keyword_analysis that connect the existing_keyword to current article
         existing_keyword = self.find_by(name: keyword['text'])
         if existing_keyword
-          new_keyword_analysis = article.keyword_analyses.new
+          new_keyword_analysis = article.keyword_analyses.new(name: keyword['text'])
           new_keyword_analysis.keyword = existing_keyword
           # calculate relevance based on the ranking of the keyword given by NYTimes
           if keyword['relevance'].to_f
@@ -23,7 +23,7 @@ class Keyword < ActiveRecord::Base
         else
           # otherwise, create a new_keyword, then create a new_keyword_analysis that connect it with the current article
           new_keyword = self.create(name: keyword['text'])
-          new_keyword_analysis = article.keyword_analyses.new
+          new_keyword_analysis = article.keyword_analyses.new(name: keyword['text'])
           new_keyword_analysis.keyword = new_keyword
           if keyword['relevance'].to_f
             new_keyword_analysis[:relevance] = keyword['relevance'].to_f
@@ -103,7 +103,7 @@ class Keyword < ActiveRecord::Base
         # if the keyword exists, create a new_keyword_analysis that connect the existing_keyword to current article
         existing_keyword = self.find_by(name: keyword['entityId'])
         if existing_keyword
-          new_keyword_analysis = article.keyword_analyses.new
+          new_keyword_analysis = article.keyword_analyses.new(name: keyword['entityId'])
           new_keyword_analysis.keyword = existing_keyword
 
           if keyword['confidenceScore']
@@ -118,7 +118,7 @@ class Keyword < ActiveRecord::Base
         else
           # otherwise, create a new_keyword, then create a new_keyword_analysis that connect it with the current article
           new_keyword = self.create(name: keyword['entityId'])
-          new_keyword_analysis = article.keyword_analyses.new
+          new_keyword_analysis = article.keyword_analyses.new(name: keyword['entityId'])
           new_keyword_analysis.keyword = new_keyword
 
           if keyword['confidenceScore']
@@ -137,6 +137,7 @@ class Keyword < ActiveRecord::Base
   end
   # define a method that remove generic keywords from keyword list of each zone
   def self.remove_generic_keywords(zones)
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Removing Generic Keywords *************"
     top_num = 9
     if zones.length <= 1
       allowed_generic_level = zones.length
@@ -173,4 +174,32 @@ class Keyword < ActiveRecord::Base
     end
     return zones
   end
+
+  def self.generate_keywords(articles)
+    # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, totla: #{articles.size} *************"
+    keywords_collection = {}
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, iteration, totla: #{articles.size} *************"
+    articles.each do |article|
+      article.keyword_analyses.each do |keyword_analysis|
+        # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
+        keyword = keyword_analysis[:name]
+        if keywords_collection.keys.include?(keyword)
+          keywords_collection["#{keyword}"] += keyword_analysis.relevance
+        else
+          keywords_collection["#{keyword}"] = keyword_analysis.relevance
+        end
+      end
+    end
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, sort, totla: #{articles.size} *************"
+    # rank the keyword and output in arry
+    ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
+    result = []
+    ranking_keyword.reverse!.each do |keyword_relevance|
+      result << {keyword: keyword_relevance[0].to_s, relevance: keyword_relevance[1]}
+    end
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, end, totla: #{articles.size} *************"
+    return result
+  end
+
 end

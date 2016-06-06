@@ -155,6 +155,7 @@ class Article < ActiveRecord::Base
 ########## Article Analysis ##########
   def self.select_articles_from_database(permitted_params)
     # if timeframe given, find all articles that has the keywords in title, abstract, lead_paragraph, or keyword within the timeframe.
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Selecting Articles *************"
     search_items = permitted_params[:search].split("|")
 
     selected_articles = []
@@ -232,29 +233,6 @@ class Article < ActiveRecord::Base
 
   end
 
-  def self.generate_keywords(articles)
-    # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
-    keywords_collection = {}
-    articles.each do |article|
-      article.keyword_analyses.each do |keyword_analysis|
-        # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
-        keyword = keyword_analysis.keyword
-        if keywords_collection.keys.include?(keyword.name)
-          keywords_collection["#{keyword.name}"] += keyword_analysis.relevance
-        else
-          keywords_collection["#{keyword.name}"] = keyword_analysis.relevance
-        end
-      end
-    end
-    # rank the keyword and output in arry
-    ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
-    result = []
-    ranking_keyword.reverse!.each do |keyword_relevance|
-      result << {keyword: keyword_relevance[0].to_s, relevance: keyword_relevance[1]}
-    end
-    return result
-  end
-
   def self.analyze_articles(permitted_params)
     # selecting articles and sort them into chronological order
     articles = Article.select_articles_from_database(permitted_params)
@@ -265,7 +243,7 @@ class Article < ActiveRecord::Base
       result = {
         article_count: article_count[:data],
         zones: Article.divide_into_zones_from_peak(articles, article_count),
-        keywords: Article.generate_keywords(articles),
+        keywords: Keyword.generate_keywords(articles),
         search_info: {
           search_string: permitted_params[:search],
           start_time: articles.first.publication_time,
@@ -281,6 +259,7 @@ class Article < ActiveRecord::Base
         }
       }
     end
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Done *************"
     return result
   end
 
@@ -316,6 +295,7 @@ class Article < ActiveRecord::Base
     puts(sum)
   end
 
+########## Private ##########
   private
   def self.threading(data, num_of_threads, start_num)
     if start_num < 10 && data[start_num]
