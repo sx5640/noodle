@@ -17,6 +17,7 @@ class Article < ActiveRecord::Base
       article = self.new(data)
       # clean up the title
       article[:title] = entry['headline']['main']
+      article[:source] = 'New York Times'
       # clean up author
       if entry['byline'] && !entry['byline'].empty?
         article[:author] = entry['byline']['original']
@@ -102,7 +103,8 @@ class Article < ActiveRecord::Base
         title: entry['webTitle'],
         publication_time: entry['webPublicationDate'].to_datetime,
         section: entry['sectionName'],
-        web_url: entry['webUrl']
+        web_url: entry['webUrl'],
+        source: 'Guardian'
       }
 
       article = self.new(data)
@@ -293,8 +295,7 @@ class Article < ActiveRecord::Base
     puts(begin_date)
     puts(end_date)
 
-    step = ((end_date - begin_date) / 1.year + 1).to_i.day
-
+    step = ((end_date - begin_date) / 6.month + 1).to_i.day
     i = 0
     if File.exist?("python/#{permitted_params[:search]}_2week.txt")
       File.delete("python/#{permitted_params[:search]}_2week.txt")

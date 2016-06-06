@@ -11,7 +11,7 @@
 
 # Article.get_all_nytimes_articles("you keyword", start date in number, end date in number, step of each earch: "year", "month", or integer which will represent days)
 
-# Article.get_all_nytimes_articles('Elon Musk', 20100101, 20170130, "year")
+# Article.get_all_nytimes_articles('Elon Musk', 20130101, 20170130, "year")
 
 # Article.get_all_nytimes_articles('Donald Trump', 20100101, 20160530, 15)
 

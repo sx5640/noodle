@@ -4,7 +4,7 @@ module ArticleMixins::Zone
     begin_date = articles.first.publication_time
     end_date = articles.last.publication_time
 
-    step = ((end_date - begin_date) / 1.year + 1).to_i.day
+    step = ((end_date - begin_date) / 12.month + 1).to_i.day
 
     data = []
 
@@ -29,7 +29,9 @@ module ArticleMixins::Zone
     end
     data_sum = articles.length
     data_size = data.length
+    data_size_non_0 = (data.select { |e| e[:count] >= 0  }).size
     data_average = data_sum.to_f / data_size
+    data_average_non_0 = data_sum.to_f / data_size_non_0
     first_difference = []
     for i in (0..(data_size - 2))
       first_difference[i] = data[i+1][:count] - data[i][:count]
@@ -40,7 +42,8 @@ module ArticleMixins::Zone
       data_not_zoned: data.clone,
       first_difference: first_difference,
       data_size: data_size,
-      data_average: data_average
+      data_average: data_average,
+      data_average_non_0: data_average_non_0
     }
     return params
   end
@@ -56,8 +59,10 @@ module ArticleMixins::Zone
     data_size = params_temp[:data_size]
     if data_size < 5
       data_average = 0
+      data_average_non_0 = 0
     else
       data_average = params_temp[:data_average]
+      data_average_non_0 = params_temp[:data_average_non_0]
     end
     zones = []
 
@@ -69,7 +74,7 @@ module ArticleMixins::Zone
     min_peak_multiplier = 4
 
     # this is the recursive condition: if the peak has value greater than n times of the average, it will generate a hot zone
-    if top_value > min_peak_multiplier * data_average
+    if top_value > min_peak_multiplier * data_average_non_0
 
       # call the move_boundary method to get the boundary of the top peak
       start_index = move_boundary(first_difference, data_not_zoned, data_size, top_index, -step/2, step)
@@ -155,11 +160,9 @@ module ArticleMixins::Zone
         days_to_peak = (article[:publication_time] - peak_time[:start_time]) / 1.day
 
         zone_relevance[article[:title]] = 0
-        if days_to_peak >= 0
-          article.keyword_analyses.each do |keyword_analysis|
-            if top_keywords.include?(keyword_analysis.keyword[:name])
-              zone_relevance[article[:title]] += keyword_analysis[:relevance] / (days_to_peak + 4)
-            end
+        article.keyword_analyses.each do |keyword_analysis|
+          if top_keywords.include?(keyword_analysis.keyword[:name])
+            zone_relevance[article[:title]] += keyword_analysis[:relevance] / (days_to_peak.abs() + 4)
           end
         end
       end
@@ -268,35 +271,37 @@ module ArticleMixins::Zone
   def calculate_hotness(zones)
     # find the max, min, average
     unless zones.empty?
-      temp = zones.inject([0,100000,0]) do |temp, zone|
-        zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
-        zone_average_count = zone[:count] / zone_size
+      count_array = zones.map {|e| e[:top_value]}
 
-        if temp[0] < zone_average_count
-          temp[0] = zone_average_count
-        end
-        if temp[1] > zone_average_count
-          temp[1] = zone_average_count
-        end
-        temp[2] += zone_average_count
-        temp
-      end
-      hottest = temp[0]
-      coldest = temp[1]
-      total = temp[2]
-      average = total/zones.length
+
+      # count_array = zones.map do |e|
+      #   zone_size = (e[:end_time] - e[:start_time]) / 1.day
+      #   e[:count] / zone_size
+      # end
+      hottest = count_array.max()
+      coldest = count_array.min()
+      divider = hottest - coldest
+      # total = count_array.sum()
+      # average = total/zones.length
+
       #calculate hotness based on the count of articles in the zone, comparing to average, max, min
       zones.each do |zone|
-        zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
-        zone_average_count = zone[:count] / zone_size
+        # zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
+        # zone_average_count = zone[:count] / zone_size
+        #
+        # # if zone_average_count > average
+        # #   zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
+        # # elsif zone_average_count < average
+        # #   zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
+        # # elsif zone_average_count == average
+        # #   zone[:hotness] = 5
+        # # end
+        #
+        # zone[:hotness] = (1 + 9*(hottest - zone_average_count)/divider).round
 
-        if zone_average_count > average
-          zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
-        elsif zone_average_count < average
-          zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
-        elsif zone_average_count == average
-          zone[:hotness] = 5
-        end
+        # zone[:hotness] = (1 + 9*(zone[:top_value] - coldest)/divider).round
+
+        zone[:hotness] = (10*zone[:top_value]/hottest).round
       end
     end
     return zones

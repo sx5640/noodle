@@ -91,6 +91,7 @@ class Keyword < ActiveRecord::Base
 
     if response['error']
       puts("error: #{response['error']}")
+      article.destroy
 
     elsif response['response']['entities']
       data = response['response']['entities']
