@@ -1,7 +1,6 @@
 <div class="container">
+  <%= image_tag "NoodleLogo.png", id: "logo" %>
   <%= tag("div", id: "search-section", data: params) %>
-
-    <h1 class="search-title">Search</h1>
 
     <%= form_tag articles_search_path, method: :get, class: "search-form" do %>
       <%= text_field_tag(
@@ -12,6 +11,7 @@
       ) %>
       <br>
     <% end %>
+    <h1 class="search-title">Search the News</h1>
   </div>
 
   <div id="search-indicator-container">

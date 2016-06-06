@@ -66,6 +66,11 @@ $(document).on('ready page:load', function() {
     showSearchActivityIndicator();
     visualization.pause(); // pause visualization so that it doesn't affect css animation performance
 
+    // Shrink logo
+    if (!$('#logo').hasClass('logo-search')) {
+      $('#logo').toggleClass('logo-search');
+    }
+
     $.ajax({
       url: url,
       type: 'GET',
