@@ -59,7 +59,7 @@ var visualization = (function() {
       scene.add(ambientLight);
 
       directionalLight = new THREE.DirectionalLight( 0xffffff, 1 );
-      directionalLight.position.set(-500, 1000, 250);
+      directionalLight.position.set(500, 1000, 250);
       directionalLight.position.multiplyScalar(1.3);
       directionalLight.castShadow = true;
       directionalLight.shadowCameraVisible = true;

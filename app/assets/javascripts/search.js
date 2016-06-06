@@ -66,6 +66,11 @@ $(document).on('ready page:load', function() {
     showSearchActivityIndicator();
     visualization.pause(); // pause visualization so that it doesn't affect css animation performance
 
+    // Shrink logo
+    if (!$('#logo').hasClass('logo-search')) {
+      $('#logo').toggleClass('logo-search');
+    }
+
     $.ajax({
       url: url,
       type: 'GET',
@@ -107,6 +112,17 @@ $(document).on('ready page:load', function() {
       }
     });
   }
+
+  //
+  // Handle event: close the autocomplete dropdown
+  //
+  $("#search").keypress(function(e){
+   if (!e) e = window.event;
+   if (e.keyCode == '13'){
+     $('#search').autocomplete('close');
+     return false;
+   }
+ });
 
   //
   // Helper function: hide all content
