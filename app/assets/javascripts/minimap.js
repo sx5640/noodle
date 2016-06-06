@@ -23,7 +23,7 @@ var minimap = (function() {
           if (zone.count > 0) {
             var htmlCircle = '<div class="circle"></div>';
             var circle;
-            var size = Math.floor(3 + zone.hotness * zone.hotness * .25);
+            var size = Math.floor(5 + zone.hotness * zone.hotness * .225);
 
             $('#minimap-container').append(htmlCircle);
             circle = $('.circle').last();
@@ -31,7 +31,7 @@ var minimap = (function() {
             circle.css('left', (50 - size / 2) + 'px');
             circle.css('width', size + 'px');
             circle.css('height', size + 'px')
-            circle.css('opacity', (zone.hotness * .2));
+            circle.css('opacity', (zone.hotness * .75));
             displayCount++;
           }
         }
