@@ -114,23 +114,13 @@ $(document).on('ready page:load', function() {
   }
 
   //
-  // Handle event: close the autocomplete dropdown
-  //
-  $("#search").keypress(function(e){
-   if (!e) e = window.event;
-   if (e.keyCode == '13'){
-     $('#search').autocomplete('close');
-     return false;
-   }
- });
-
-  //
   // Helper function: hide all content
   //
   function hideAllContent() {
     $('#keywords-container').hide();
     $('#visualization-container').hide();
     $('#timeline-nav').hide();
+    $('#down-arrow').hide();
     $('#content-container').hide();
     $('#minimap-container').hide();
   }
@@ -142,6 +132,7 @@ $(document).on('ready page:load', function() {
     $('#keywords-container').show();
     $('#visualization-container').show();
     $('#timeline-nav').show();
+    $('#down-arrow').show();
     $('#content-container').show();
     $('#minimap-container').show();
   }
@@ -508,12 +499,12 @@ $(document).on('ready page:load', function() {
       var templateZone = Handlebars.compile(sourceZone);
 
       // Display Timeline title
-      var htmlTimelineTitle = '<div id="timeline-header"><h1 class="timeline-title">Timeline</h1></div>';
+      var htmlTimelineTitle = '<div id="timeline-header"><h1 class="timeline-title">Big Moments</h1></div>';
       $('#timeline').prepend(htmlTimelineTitle);
 
       if (data.user && data.user.saved_this_timeline === false) {
 
-        var htmlTimelineSave = '<h1 id="save-timeline-button"><a id="save-timeline" href="">*</a></h1>';
+        var htmlTimelineSave = '<div id="save-timeline-button"><a id="save-timeline" href="">Save Timeline</a></div>';
         $('#timeline-header').append(htmlTimelineSave);
 
         // Add event handler for saving the timeline to the user model
@@ -532,7 +523,7 @@ $(document).on('ready page:load', function() {
               end_time: data.search_info.end_time
             },
             success: function(data) {
-              $('#save-timeline-button').html('<h1 class="timeline-saved-message">saved</h1>');
+              $('#save-timeline-button').html('<div class="timeline-saved-message">saved</div>');
             }
           });
         });

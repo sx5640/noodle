@@ -7,7 +7,8 @@
           :search,
           params[:search],
           # placeholder: "search",
-          class: "form-control"
+          class: "form-control",
+          autocomplete: "off"
       ) %>
       <br>
     <% end %>
@@ -31,6 +32,8 @@
 <div class="container">
   <div id="timeline-nav">
   </div>
+
+  <%= image_tag "DownArrow.png", id: "down-arrow" %>
 
   <div id="content-container">
   </div>

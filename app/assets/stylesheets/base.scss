@@ -140,6 +140,12 @@ main {
   }
 }
 
+#down-arrow {
+  display: block;
+  margin: 0 auto;
+  margin-bottom: 60px;
+}
+
 h1.search-title {
   color: black;
   font-size: .735rem;
@@ -255,7 +261,7 @@ h1.search-title {
 }
 
 .timeline-title {
-  font-family: 'Roboto Slab';
+  font-family: 'Fira Sans';
   font-size: 1.777777rem;
   font-weight: 200;
   color: black;
@@ -267,16 +273,22 @@ h1.search-title {
 }
 
 #save-timeline-button {
-  @extend .timeline-title;
-  letter-spacing: normal;
+  margin: 0 auto;
+  font-family: 'Fira Sans';
+  font-size: .735rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  text-align: center;
+  width: 100px;
+  height: 30px;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: black;
 }
 
 .timeline-saved-message {
-  font-family: 'Fira Sans';
-  font-size: 1rem;
-  font-weight: 400;
-  text-transform: uppercase;
-  letter-spacing: normal;
 }
 
 .zone {
