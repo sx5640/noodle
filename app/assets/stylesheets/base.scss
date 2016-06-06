@@ -47,8 +47,8 @@ section h2 {
 .nav-bar {
   width: 100%;
   color: black;
-  height: 60px;
-  padding: 0 30px;
+  height: 80px;
+  padding: 0 40px;
   position: fixed;
   z-index: 1000;
 }
@@ -62,16 +62,15 @@ section h2 {
 .title {
   margin: 0;
   float: left;
-  line-height: 60px;
+  line-height: 80px;
   text-transform: uppercase;
   font-size: .735rem;
-  font-weight: 500;
+  font-weight: 300;
 
   a:visited {
     color: black;
   }
 }
-
 
 .nav-list {
   float: right;
@@ -82,10 +81,10 @@ section h2 {
 .nav-item {
   list-style-type: none;
   display: inline;
-  line-height: 60px;
+  line-height: 80px;
   text-transform: uppercase;
   font-size: .735rem;
-  font-weight: 500;
+  font-weight: 300;
   padding-left: 1.777777rem;
 
   a:visited {
@@ -110,7 +109,7 @@ section h2 {
 main {
   width: 100%;
   float: left;
-  padding: 30px;
+  // padding: 30px;
 }
 
 .container {
@@ -127,18 +126,28 @@ main {
 
 #logo {
   display: block;
-  margin: 120px auto;
-  max-width: 80px;
-  opacity: .1;
+  margin: 0 auto;
+  max-width: 125px;
+  margin-top: 40px;
+
+  &.logo-search {
+    transition-property: all;
+    transition-duration: .5s;
+    // transform: scale(.5);
+    max-width: 50px;
+    margin-top: 10px;
+    padding: 0px;
+  }
 }
 
 h1.search-title {
   color: black;
-  font-size: .75rem;
+  font-size: .735rem;
   font-weight: 200;
   text-transform: uppercase;
   text-align: center;
-  margin: 0;
+  margin-top: 10px;
+  margin-bottom: 30px;
 }
 
 #search-section {
@@ -151,8 +160,8 @@ h1.search-title {
   font-weight: 100;
   color: #00c8ff;
   border-width: 0;
-  border-bottom-width: 2px;
-  border-bottom-color: #ccc;
+  border-bottom-width: 1px;
+  border-bottom-color: #000;
   margin: 0;
 
   &:hover {
@@ -231,7 +240,6 @@ h1.search-title {
 #top-keywords-list {
   word-spacing: -0.1rem;
   text-align: center;
-  margin-bottom: 60px;
 
   li {
     display: inline;
@@ -243,6 +251,7 @@ h1.search-title {
   font-size: 1.333333rem;
   font-weight: 400;
   color: #00c8ff;
+  text-transform: uppercase;
 }
 
 .timeline-title {
@@ -253,7 +262,7 @@ h1.search-title {
   text-align: center;
   letter-spacing: 1rem;
   text-transform: uppercase;
-  padding-top: 1.777777rem;
+  // padding-top: 1.777777rem;
   padding-bottom: .75rem;
 }
 
