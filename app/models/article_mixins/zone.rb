@@ -279,13 +279,13 @@ module ArticleMixins::Zone
     puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Calculating Hotness *************"
     # find the max, min, average
     unless zones.empty?
-      count_array = zones.map {|e| e[:top_value]}
+      top_array = zones.map {|e| e[:top_value]}
 
 
-      # count_array = zones.map do |e|
-      #   zone_size = (e[:end_time] - e[:start_time]) / 1.day
-      #   e[:count] / zone_size
-      # end
+      count_array = zones.map do |e|
+        zone_size = (e[:end_time] - e[:start_time]) / 1.day
+        e[:count] / zone_size
+      end
       hottest = count_array.max()
       coldest = count_array.min()
       divider = hottest - coldest
@@ -294,22 +294,18 @@ module ArticleMixins::Zone
 
       #calculate hotness based on the count of articles in the zone, comparing to average, max, min
       zones.each do |zone|
-        # zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
-        # zone_average_count = zone[:count] / zone_size
-        #
-        # # if zone_average_count > average
-        # #   zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
-        # # elsif zone_average_count < average
-        # #   zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
-        # # elsif zone_average_count == average
-        # #   zone[:hotness] = 5
-        # # end
-        #
-        # zone[:hotness] = (1 + 9*(hottest - zone_average_count)/divider).round
+        zone_size = (zone[:end_time] - zone[:start_time]) / 1.day
+        zone_average_count = zone[:count] / zone_size
 
-        # zone[:hotness] = (1 + 9*(zone[:top_value] - coldest)/divider).round
+        # if zone_average_count > average
+        #   zone[:hotness] = (5 + (zone_average_count - average) * 5 / (hottest - average)).round
+        # elsif zone_average_count < average
+        #   zone[:hotness] = 5 - ((average - zone_average_count) * 5 / (average - coldest)).round
+        # elsif zone_average_count == average
+        #   zone[:hotness] = 5
+        # end
 
-        zone[:hotness] = (10*zone[:top_value]/hottest).round
+        zone[:hotness] = 2 + (4*(zone_average_count - coldest)/divider).round + (4*zone[:top_value]/top_array.max()).round
       end
     end
     return zones
