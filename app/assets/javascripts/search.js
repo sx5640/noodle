@@ -104,7 +104,7 @@ $(document).on('ready page:load', function() {
         showAllContent();
 
         // Render 3D visualization
-        visualization.render(data['article_count']);
+        visualization.render(data['article_count'], data['search_info'], data['zones']);
 
         // Render minimap
         minimap.render(data['zones']);
@@ -279,7 +279,7 @@ $(document).on('ready page:load', function() {
     $('#visualization-container').show();
 
     // Re-render 3D visualization to reflect the current timeline view
-    visualization.render(data['article_count']);
+    visualization.render(data['article_count'], data['search_info'], data['zones']);
 
     // Re-render the minimap to reflect the current timeline view
     minimap.render(global_data[global_data.length - 1]['zones']);
