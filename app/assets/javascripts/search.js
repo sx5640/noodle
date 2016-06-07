@@ -499,7 +499,7 @@ $(document).on('ready page:load', function() {
       var templateZone = Handlebars.compile(sourceZone);
 
       // Display Timeline title
-      var htmlTimelineTitle = '<div id="timeline-header"><h1 class="timeline-title">Big Moments</h1></div>';
+      var htmlTimelineTitle = '<div id="timeline-header"><h1 class="timeline-title"> Big Moments</h1></div>';
       $('#timeline').prepend(htmlTimelineTitle);
 
       if (data.user && data.user.saved_this_timeline === false) {
