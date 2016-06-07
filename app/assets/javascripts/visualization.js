@@ -116,10 +116,11 @@ var visualization = (function() {
     //
     // View: Renders a 3D visualization of the given zones array to #visualization-container
     //
-    render: function(zones) {
+    render: function(articleZones, searchInfo, zones) {
       // Reset visualizationRendered flag so that it animates into view
       visualizationRendered = false;
       paused = false;
+      var spacing = 16;
 
       // Remove all previously added objects from the scene, other than camera
       for (let i = scene.children.length - 1; i >= 0 ; i--) {
@@ -134,24 +135,75 @@ var visualization = (function() {
       boxMeshes = [];
 
       // Create one cube object for each zone (even empty zones) and add them to the scene
-      var numZones = zones.length;
-      console.log('numZones: ', numZones);
-      for (var i = 0; i < numZones; i++) {
-        if (zones[i].count > 0) {
-          var spacing = 16;
-          var zone = zones[i];
-          var verticalSize = 5 + zone.count * 240;
+      var numArticleZones = articleZones.length;
+      var maxVerticalSize = 0;
+      console.log('numArticleZones: ', numArticleZones);
+      for (var i = 0; i < numArticleZones; i++) {
+        if (articleZones[i].count > 0) {
+          var articleZone = articleZones[i];
+          var verticalSize = 5 + articleZone.count * 80;
+          if (verticalSize > maxVerticalSize) {
+            maxVerticalSize = verticalSize;
+            // console.log('MAX VERTICAL 1 ' + maxVerticalSize);
+          }
           var boxGeometry = new THREE.BoxGeometry( 100, verticalSize, 300 );
           var boxMaterial = new THREE.MeshLambertMaterial( { color: 0x00c8ff, opacity: 1.0 } );
           var cube = new THREE.Mesh( boxGeometry, boxMaterial );
-          var xScale = Math.max(0.05, 0.25 * 1/(zone.count * zone.count));
+          var xScale = Math.max(0.05, 0.25 * 1/(articleZone.count * articleZone.count));
           cube.castShadow = true;
           cube.receiveShadow = true;
           cube.scale.setX(xScale);
-          cube.position.set( (i - numZones/2) * spacing, verticalSize/2, 0 );
+          cube.position.set( (i - numArticleZones/2) * spacing, verticalSize/2, 0 );
           cube.material.opacity = verticalSize/500;
           boxMeshes.push( { mesh: cube, targetHeight: verticalSize } ); // Stash box for later use
           scene.add( cube );
+          // console.log('>>>' + cube.position.x);
+        }
+      }
+
+      // Create a cube object for each zone if provided
+      if (searchInfo && zones) {
+        var overallStartTime = searchInfo.start_time;
+        var overallEndTime = searchInfo.end_time;
+        var zoneStartTime, zoneEndTime;
+        var jOverallStartTime = new Date(overallStartTime);
+        var jOverallEndTime = new Date(overallEndTime);
+        var jZoneStartTime, jZoneEndTime;
+        var zoneOffsetStart, zoneOffsetEnd;
+        // console.log('timeline start_time: ' + overallStartTime);
+        // console.log('timeline end_time: ' + overallEndTime);
+        // console.log('timeline start_time (JS): ' + jOverallStartTime);
+        // console.log('timeline end_time (JS): ' + jOverallEndTime);
+
+        for (var j = 0; j < zones.length; j++) {
+          // console.log('ZONE # ' + j);
+          zoneStartTime = zones[j].start_time;
+          zoneEndTime = zones[j].end_time;
+          jZoneStartTime = new Date(zoneStartTime);
+          jZoneEndTime = new Date(zoneEndTime);
+          // console.log('zone ' + j + ' start_time: ' + zoneStartTime);
+          // console.log('zone ' + j + ' end_time: ' + zoneEndTime);
+          // console.log('zone ' + j + ' start_time (JS): ' + jZoneStartTime);
+          // console.log('zone ' + j + ' end_time (JS): ' + jZoneEndTime);
+
+          zoneOffsetStart = (jZoneStartTime - jOverallStartTime) / (jOverallEndTime - jOverallStartTime);
+          zoneOffsetEnd = (jZoneEndTime - jOverallStartTime) / (jOverallEndTime - jOverallStartTime);
+          // console.log('zoneOffsetStart: ' + zoneOffsetStart);
+          // console.log('zoneOffsetEnd: ' + zoneOffsetEnd);
+
+          var zoneOffsetStartWorld = (zoneOffsetStart * numArticleZones * spacing) - ((numArticleZones/2) * spacing);
+          var zoneOffsetEndWorld = (zoneOffsetEnd * numArticleZones * spacing) - ((numArticleZones/2) * spacing);
+          var zoneWidthWorld = zoneOffsetEndWorld - zoneOffsetStartWorld;
+          // console.log('zoneOffsetStartWorld: ' + zoneOffsetStartWorld);
+          // console.log('zoneOffsetEndWorld: ' + zoneOffsetEndWorld);
+          // console.log('zoneWidthWorld: ' + zoneWidthWorld);
+          // console.log('MAX VERTICAL 2 ' + maxVerticalSize);
+          var zoneBoxGeometry = new THREE.BoxGeometry( zoneWidthWorld, maxVerticalSize * 2, 10 );
+          var zoneBoxMaterial = new THREE.MeshLambertMaterial( { color: 0x5f5f5f, opacity: 1.0 } );
+          var zoneCube = new THREE.Mesh( zoneBoxGeometry, zoneBoxMaterial );
+          zoneCube.position.set(zoneOffsetStartWorld + zoneWidthWorld/2, 0, -150);
+          zoneCube.material.opacity = zones[j].hotness/10;
+          scene.add(zoneCube);
         }
       }
     },

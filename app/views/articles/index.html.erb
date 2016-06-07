@@ -64,7 +64,26 @@
       <h2 class="article-summary-title">{{title}}</h2>
       <p class="article-author">{{author}}</p>
       <p class="article-summary-body">{{lead_paragraph}}</p>
-  		<a class="article-web-url" href="{{web_url}}">More</a>
+  		<a class="article-web-url" href="{{web_url}}" target="_blank">More</a>
+    </div>
+	</li>
+</script>
+
+<script id="template-articlesview" type="text/x-handlebars-template">
+	<li class="zone">
+    <div class="aside">
+      <ul class="keywords">
+        <li class="article-source">{{source}}</li>
+        <li class="article-section">{{section}}</li>
+      </ul>
+      <div class="number-of-articles">
+      </div>
+    </div>
+    <div class="article-summary">
+      <h2 class="article-summary-title">{{title}}</h2>
+      <p class="article-author">{{author}}</p>
+      <p class="article-summary-body">{{lead_paragraph}}</p>
+  		<a class="article-web-url" href="{{web_url}}" target="_blank">{{web_url}}</a>
     </div>
 	</li>
 </script>

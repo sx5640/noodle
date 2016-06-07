@@ -45,11 +45,13 @@ $(document).on('ready page:load', function() {
 
   // Perform a search via AJAX request
   function newSearch(search_string, start_time, end_time) {
+    $('#search').val(search_string);
     searchFunction(search_string, start_time, end_time, false);
   };
 
   // Perform a subsearch via AJAX request
   function subSearch(search_string, start_time, end_time) {
+    $('#search').val(search_string);
     searchFunction(search_string, start_time, end_time, true);
   };
 
@@ -87,7 +89,7 @@ $(document).on('ready page:load', function() {
 
         // Clear the view stack and corresponding data stack, and clear any timeline navigation still present
         if (is_sub_search) {
-          var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+          var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Previous Timeline</a>';
           $('#timeline-nav').html(htmlBackToTimeline);
         } else {
           global_views = [];
@@ -104,7 +106,7 @@ $(document).on('ready page:load', function() {
         showAllContent();
 
         // Render 3D visualization
-        visualization.render(data['article_count']);
+        visualization.render(data['article_count'], data['search_info'], data['zones']);
 
         // Render minimap
         minimap.render(data['zones']);
@@ -171,7 +173,9 @@ $(document).on('ready page:load', function() {
   function clickKeyword(eventObject) {
     eventObject.preventDefault();
 
-    subSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text());
+    var search_string = global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text();
+    search_string = search_string.toLowerCase();
+    subSearch(search_string);
   }
 
   //
@@ -214,19 +218,16 @@ $(document).on('ready page:load', function() {
         $('#content-container').append(htmlArticleList);
 
         // Add a 'back to timeline' link - the most basic timeline navigation
-        var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+        var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Previous Timeline</a>';
         $('#timeline-nav').html(htmlBackToTimeline);
 
         // Construct each article using the article-summary - reuse template-zone for now
-        var sourceZone = $('#template-zone').html();
+        var sourceZone = $('#template-articlesview').html();
         var templateZone = Handlebars.compile(sourceZone);
 
         for (var i = 0; i < zone.count; i++) {
           var htmlArticle = templateZone(zone.article_list[i]);
           $('.article-list').append(htmlArticle);
-
-          // Append first 3 keywords
-          timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
         }
 
         // Push articles view onto view stack
@@ -279,7 +280,7 @@ $(document).on('ready page:load', function() {
     $('#visualization-container').show();
 
     // Re-render 3D visualization to reflect the current timeline view
-    visualization.render(data['article_count']);
+    visualization.render(data['article_count'], data['search_info'], data['zones']);
 
     // Re-render the minimap to reflect the current timeline view
     minimap.render(global_data[global_data.length - 1]['zones']);
@@ -331,8 +332,7 @@ $(document).on('ready page:load', function() {
     var minimapY = eventObject.pageY - offset.top;
     var minimapHeight = 500;
     var zoneListHeight = $('#zone-list').outerHeight();
-    var newY = minimapY/minimapHeight * zoneListHeight;
-
+    var newY = minimapY/minimapHeight * zoneListHeight + $('keywords-list').outerHeight() + $('#visualization-container').outerHeight() + $('#down-arrow').outerHeight() + $('#logo').outerHeight() + 80;
     $(document).scrollTop(newY);
   });
 
@@ -505,6 +505,7 @@ $(document).on('ready page:load', function() {
       if (data.user && data.user.saved_this_timeline === false) {
 
         var htmlTimelineSave = '<div id="save-timeline-button"><a id="save-timeline" href="">Save Timeline</a></div>';
+        // var htmlTimelineSave = '<div id="save-timeline-button"><button type="button" id="save-timeline">Save Timeline</button></div>';
         $('#timeline-header').append(htmlTimelineSave);
 
         // Add event handler for saving the timeline to the user model
@@ -523,7 +524,7 @@ $(document).on('ready page:load', function() {
               end_time: data.search_info.end_time
             },
             success: function(data) {
-              $('#save-timeline-button').html('<div class="timeline-saved-message">saved</div>');
+              $('#save-timeline').html('Saved!');
             }
           });
         });
