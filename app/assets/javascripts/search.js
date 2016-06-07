@@ -45,11 +45,13 @@ $(document).on('ready page:load', function() {
 
   // Perform a search via AJAX request
   function newSearch(search_string, start_time, end_time) {
+    $('#search').val(search_string);
     searchFunction(search_string, start_time, end_time, false);
   };
 
   // Perform a subsearch via AJAX request
   function subSearch(search_string, start_time, end_time) {
+    $('#search').val(search_string);
     searchFunction(search_string, start_time, end_time, true);
   };
 
@@ -171,7 +173,9 @@ $(document).on('ready page:load', function() {
   function clickKeyword(eventObject) {
     eventObject.preventDefault();
 
-    subSearch(global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text());
+    var search_string = global_data[global_data.length - 1].search_info.search_string + "|" + $(eventObject.target).text();
+    search_string = search_string.toLowerCase();
+    subSearch(search_string);
   }
 
   //
