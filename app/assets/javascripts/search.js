@@ -505,6 +505,7 @@ $(document).on('ready page:load', function() {
       if (data.user && data.user.saved_this_timeline === false) {
 
         var htmlTimelineSave = '<div id="save-timeline-button"><a id="save-timeline" href="">Save Timeline</a></div>';
+        // var htmlTimelineSave = '<div id="save-timeline-button"><button type="button" id="save-timeline">Save Timeline</button></div>';
         $('#timeline-header').append(htmlTimelineSave);
 
         // Add event handler for saving the timeline to the user model
@@ -523,7 +524,7 @@ $(document).on('ready page:load', function() {
               end_time: data.search_info.end_time
             },
             success: function(data) {
-              $('#save-timeline-button').html('<div class="timeline-saved-message">saved</div>');
+              $('#save-timeline').html('Saved!');
             }
           });
         });
