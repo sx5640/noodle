@@ -29,9 +29,9 @@ var timeline = (function() {
             htmlKeyword = "<li><a href='/' class='" + className + "'>" + keywordsArray[i].keyword + "</a></li>";
             relevance = keywordsArray[i].relevance;
             fontWeight = '100';
-            // if (relevance > 10.0 * relevanceScaleFactor) {
-            //   fontWeight = '500';
-            // } else
+            if (relevance > 10.0 * relevanceScaleFactor) {
+              fontWeight = '500';
+            } else
             if (relevance > 3.0 * relevanceScaleFactor) {
               fontWeight = '400';
             } else if (relevance > 2.0 * relevanceScaleFactor) {

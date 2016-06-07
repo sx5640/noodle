@@ -1,8 +1,10 @@
-<h1 class="userprofile-title">User</h1>
-<h2 class="userprofile-email"><%= @user.email %></h2>
-<h2 class="userprofile-savedtimelines-title">Noodles</h2>
-<ul class="userprofile-savedtimelines">
-  <% @saved_timelines.each do |timeline| %>
-    <li><a href="<%= root_path(search_string: timeline.search_string, start_time: timeline.start_time, end_time: timeline.end_time) %>" class="userprofile-savedtimeline"><%= timeline.search_string %></a></li>
-  <% end %>
-</ul>
+<div class="container">
+  <h1 class="userprofile-title">User</h1>
+  <h2 class="userprofile-email"><%= @user.email %></h2>
+  <h2 class="userprofile-savedtimelines-title">Noodles</h2>
+  <ul class="userprofile-savedtimelines">
+    <% @saved_timelines.each do |timeline| %>
+      <li><a href="<%= root_path(search_string: timeline.search_string, start_time: timeline.start_time, end_time: timeline.end_time) %>" class="userprofile-savedtimeline"><%= timeline.search_string %></a></li>
+    <% end %>
+  </ul>
+</div>
