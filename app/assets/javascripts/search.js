@@ -89,7 +89,7 @@ $(document).on('ready page:load', function() {
 
         // Clear the view stack and corresponding data stack, and clear any timeline navigation still present
         if (is_sub_search) {
-          var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+          var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Previous Timeline</a>';
           $('#timeline-nav').html(htmlBackToTimeline);
         } else {
           global_views = [];
@@ -218,7 +218,7 @@ $(document).on('ready page:load', function() {
         $('#content-container').append(htmlArticleList);
 
         // Add a 'back to timeline' link - the most basic timeline navigation
-        var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Timeline</a>';
+        var htmlBackToTimeline = '<a id="back-to-timeline" href="">Back to Previous Timeline</a>';
         $('#timeline-nav').html(htmlBackToTimeline);
 
         // Construct each article using the article-summary - reuse template-zone for now
