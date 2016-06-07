@@ -222,15 +222,12 @@ $(document).on('ready page:load', function() {
         $('#timeline-nav').html(htmlBackToTimeline);
 
         // Construct each article using the article-summary - reuse template-zone for now
-        var sourceZone = $('#template-zone').html();
+        var sourceZone = $('#template-articlesview').html();
         var templateZone = Handlebars.compile(sourceZone);
 
         for (var i = 0; i < zone.count; i++) {
           var htmlArticle = templateZone(zone.article_list[i]);
           $('.article-list').append(htmlArticle);
-
-          // Append first 3 keywords
-          timeline.replaceKeywords(zone.keywords, 3, $('.keywords').last(), 'top-keywords-zone', .25);
         }
 
         // Push articles view onto view stack
