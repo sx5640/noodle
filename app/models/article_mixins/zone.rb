@@ -1,3 +1,5 @@
+require 'benchmark'
+
 module ArticleMixins::Zone
   # define a method that count the number of articles in each time unit. the unit is determined by the length of the selected time frame. if the selected articles spans a year, this method will return the number of articles per day; if the selected articles spans 2 years, this method will return the number of articles per 2 days
   def count_articles(articles)
@@ -11,24 +13,28 @@ module ArticleMixins::Zone
     data = []
 
     i = 0
+    t = Benchmark.measure do
 
-    while begin_date + i*step <= end_date + step
+      while begin_date + i*step <= end_date + step
 
-      start_time = begin_date + i*step
-      end_time = begin_date + (i+1)*step
+        start_time = begin_date + i*step
+        end_time = begin_date + (i+1)*step
 
-      articles_in_unit = articles.select { |article|
-      article.publication_time >= begin_date + i*step &&
-      article.publication_time < begin_date + (i+1)*step}
+        articles_in_unit = articles.select { |article|
+          article.publication_time >= begin_date + i*step &&
+          article.publication_time < begin_date + (i+1)*step
+        }
 
-      data[i] = {
-        start_time: start_time,
-        end_time: end_time,
-        count: articles_in_unit.length,
-      }
+        data[i] = {
+          start_time: start_time,
+          end_time: end_time,
+          count: articles_in_unit.length,
+        }
 
-      i += 1
+        i += 1
+      end
     end
+    puts "while loop time: #{t}"
     data_sum = articles.length
     data_size = data.length
     data_size_non_0 = (data.select { |e| e[:count] >= 0  }).size
@@ -139,7 +145,6 @@ module ArticleMixins::Zone
     puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Working on Zones *************"
 
     zones = self.create_zone_from_peak(params)
-    puts zones
     for i in (0 .. (zones.length - 1))
       zones[i][:article_list] = articles.select { |article|
         article.publication_time >= zones[i][:start_time] && article.publication_time < zones[i][:end_time]
@@ -162,17 +167,18 @@ module ArticleMixins::Zone
       top_keywords = zone[:keywords][0..top_num].map { |e| e[:keyword] }
 
       zone_relevance = {}
+      t = Benchmark.measure do
+        zone[:article_list].each do |article|
+          days_to_peak = (article[:publication_time] - peak_time[:start_time]) / 1.day
 
-      zone[:article_list].each do |article|
-        days_to_peak = (article[:publication_time] - peak_time[:start_time]) / 1.day
-
-        zone_relevance[article[:title]] = 0
-        article.keyword_analyses.each do |keyword_analysis|
-          if top_keywords.include?(keyword_analysis.keyword[:name])
+          zone_relevance[article[:title]] = 0
+          KeywordAnalysis.where("article_id = ? AND name IN (?)", article[:id], top_keywords).each do |keyword_analysis|
             zone_relevance[article[:title]] += keyword_analysis[:relevance] / (days_to_peak.abs() + 4)
           end
         end
       end
+
+      puts "double interation time: #{t}"
       zone[:article_list].sort! {|a,b|
         zone_relevance[b[:title]] <=> zone_relevance[a[:title]]
       }
@@ -288,7 +294,9 @@ module ArticleMixins::Zone
       end
       hottest = count_array.max()
       coldest = count_array.min()
-      divider = hottest - coldest
+      if hottest - coldest > 0
+        divider = hottest - coldest
+      end
       # total = count_array.sum()
       # average = total/zones.length
 
@@ -305,7 +313,11 @@ module ArticleMixins::Zone
         #   zone[:hotness] = 5
         # end
 
-        zone[:hotness] = 2 + (4*(zone_average_count - coldest)/divider).round + (4*zone[:top_value]/top_array.max()).round
+        if divider
+          zone[:hotness] = 2 + (4*(zone_average_count - coldest)/divider).round + (4*zone[:top_value]/top_array.max()).round
+        else
+          zone[:hotness] = 2 + (4*zone[:top_value]/top_array.max()).round
+        end
       end
     end
     return zones

@@ -1,3 +1,5 @@
+require "benchmark"
+
 class Keyword < ActiveRecord::Base
   has_many :keyword_analyses
   has_many :articles, through: :keyword_analyses
@@ -178,10 +180,13 @@ class Keyword < ActiveRecord::Base
   def self.generate_keywords(articles)
     # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
     puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, totla: #{articles.size} *************"
+    article_ids = articles.map { |e| e[:id]  }
+
     keywords_collection = {}
-    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, iteration, totla: #{articles.size} *************"
-    articles.each do |article|
-      article.keyword_analyses.each do |keyword_analysis|
+
+    t = Benchmark.measure do
+
+      KeywordAnalysis.joins(:article).where("article_id in (?)", article_ids).each do |keyword_analysis|
         # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
         keyword = keyword_analysis[:name]
         if keywords_collection.keys.include?(keyword)
@@ -191,7 +196,7 @@ class Keyword < ActiveRecord::Base
         end
       end
     end
-    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, sort, totla: #{articles.size} *************"
+    puts "************* Generating Keywords, iteration, totla: #{t} *************"
     # rank the keyword and output in arry
     ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
     result = []
