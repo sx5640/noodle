@@ -335,8 +335,7 @@ $(document).on('ready page:load', function() {
     var minimapY = eventObject.pageY - offset.top;
     var minimapHeight = 500;
     var zoneListHeight = $('#zone-list').outerHeight();
-    var newY = minimapY/minimapHeight * zoneListHeight;
-
+    var newY = minimapY/minimapHeight * zoneListHeight + $('keywords-list').outerHeight() + $('#visualization-container').outerHeight() + $('#down-arrow').outerHeight() + $('#logo').outerHeight() + 80;
     $(document).scrollTop(newY);
   });
 
