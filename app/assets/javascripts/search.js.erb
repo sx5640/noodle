@@ -504,9 +504,10 @@ $(document).on('ready page:load', function() {
 
       if (data.user && data.user.saved_this_timeline === false) {
 
-        var htmlTimelineSave = '<div id="save-timeline-button"><a id="save-timeline" href="">Save Timeline</a></div>';
-        // var htmlTimelineSave = '<div id="save-timeline-button"><button type="button" id="save-timeline">Save Timeline</button></div>';
+        // var htmlTimelineSave = '<div id="save-timeline-button"><a id="save-timeline" href="">Save Timeline</a></div>';
+        var htmlTimelineSave = '<div id="save-timeline-button"><img id="save-timeline"/></div>';
         $('#timeline-header').append(htmlTimelineSave);
+        $('#save-timeline').attr({ src: "<%= asset_path('Star.png') %>" });
 
         // Add event handler for saving the timeline to the user model
         $('#save-timeline').on('click', function(eventObject) {
@@ -524,7 +525,8 @@ $(document).on('ready page:load', function() {
               end_time: data.search_info.end_time
             },
             success: function(data) {
-              $('#save-timeline').html('Saved!');
+              $('#save-timeline').attr({ src: "<%= asset_path('StarSaved.png') %>" });
+              $('#save-timeline').off('click');
             }
           });
         });
