@@ -1,3 +1,9 @@
+# How to read this code:
+# You should start from self.analyze_articles in article.rb, and follow the method to read the rest.
+# you shall go to article_mixins/zone.rb to find Article.count_articles and Article.divide_into_zones_from_peak
+# Database Construction and private method are for seeding database. they shall be read following order they are called in seeds.rb
+# Transfer data to Python is not part of the program and will not appear after deployment. it is the starting point for reading the python part of the project, but otherwise, it is optional
+
 require 'article_mixins/zone.rb'
 
 class Article < ActiveRecord::Base
@@ -233,6 +239,7 @@ class Article < ActiveRecord::Base
 
   end
 
+  # this is the ultimate method for doing a search
   def self.analyze_articles(permitted_params)
     # selecting articles and sort them into chronological order
     articles = Article.select_articles_from_database(permitted_params)

@@ -4,6 +4,9 @@ class Keyword < ActiveRecord::Base
   has_many :keyword_analyses
   has_many :articles, through: :keyword_analyses
 
+########## Get Keyword Analysis ##########
+  # the following methods are different ways of loading keywords and keyword analyses, each using a different source.
+  # this methods will only be called during seeding process
   def self.get_watson_keywords(article)
     response = JSON.parse(Typhoeus.get("http://gateway-a.watsonplatform.net/calls/url/URLGetRankedKeywords?apikey=#{Rails.application.secrets.watson_alchemyapi_key}&url=#{article[:web_url]}&outputMode=json").body)
 
@@ -137,6 +140,58 @@ class Keyword < ActiveRecord::Base
       end
     end
   end
+
+########## Keyword Analysis during Search ##########
+  # given a list of articles (it could be the entire search or just a time zone), find all the related keywords, and for each keyword, sum up the relevanceScore with all the articles in the list
+  def self.generate_keywords(articles)
+    # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, totla: #{articles.size} *************"
+    article_ids = articles.map { |e| e[:id]  }
+
+    keywords_collection = {}
+
+    t = Benchmark.measure do
+      # method 2, takes 7 s for searching "spacex"
+      # related_keywords = []
+      # t1 =Benchmark.measure do
+      #   related_keyword_ids = KeywordAnalysis.where("article_id in (?)", article_ids).select("keyword_id")
+      #   related_keywords = Keyword.where("id in (?)", related_keyword_ids)
+      #   puts related_keywords.size
+      # end
+      # puts "Generating Keywords, iteration, find related keywords: #{t1}"
+      # t2 = Benchmark.measure do
+      #   related_keywords.each do |keyword|
+      #     temp = KeywordAnalysis.where("keyword_id = (?) and article_id in (?)", keyword[:id], article_ids).sum("relevance")
+      #     if temp != 0
+      #       keywords_collection[keyword[:name]] = temp
+      #     end
+      #   end
+      # end
+      # puts "Generating Keywords, iteration, collect relevance: #{t2}"
+
+
+      # method 1, takes 1 s for searching "spacex"
+      KeywordAnalysis.where("article_id in (?)", article_ids).each do |keyword_analysis|
+        # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
+        keyword = keyword_analysis[:name]
+        if keywords_collection.keys.include?(keyword)
+          keywords_collection["#{keyword}"] += keyword_analysis.relevance
+        else
+          keywords_collection["#{keyword}"] = keyword_analysis.relevance
+        end
+      end
+    end
+    puts "Generating Keywords, iteration, totla: #{t}"
+    # rank the keyword and output in arry
+    ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
+    result = []
+    ranking_keyword.reverse!.each do |keyword_relevance|
+      result << {keyword: keyword_relevance[0].to_s, relevance: keyword_relevance[1]}
+    end
+    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, end, totla: #{articles.size} *************"
+    return result
+  end
+
   # define a method that remove generic keywords from keyword list of each zone
   def self.remove_generic_keywords(zones)
     puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Removing Generic Keywords *************"
@@ -175,36 +230,6 @@ class Keyword < ActiveRecord::Base
       end
     end
     return zones
-  end
-
-  def self.generate_keywords(articles)
-    # creating an empty keyword collection for the given article. the key will be the keyword, and the value will be the sum of relevance of the keyword among all selected articles
-    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, totla: #{articles.size} *************"
-    article_ids = articles.map { |e| e[:id]  }
-
-    keywords_collection = {}
-
-    t = Benchmark.measure do
-
-      KeywordAnalysis.joins(:article).where("article_id in (?)", article_ids).each do |keyword_analysis|
-        # iterate through all article and keyword pairs and try to find the keyword_analysis that connect them.
-        keyword = keyword_analysis[:name]
-        if keywords_collection.keys.include?(keyword)
-          keywords_collection["#{keyword}"] += keyword_analysis.relevance
-        else
-          keywords_collection["#{keyword}"] = keyword_analysis.relevance
-        end
-      end
-    end
-    puts "************* Generating Keywords, iteration, totla: #{t} *************"
-    # rank the keyword and output in arry
-    ranking_keyword = keywords_collection.sort_by {|keyword, relevance| relevance}
-    result = []
-    ranking_keyword.reverse!.each do |keyword_relevance|
-      result << {keyword: keyword_relevance[0].to_s, relevance: keyword_relevance[1]}
-    end
-    puts "#{Time.now.strftime("%m/%d/%Y %T,%L")}************* Generating Keywords, end, totla: #{articles.size} *************"
-    return result
   end
 
 end
