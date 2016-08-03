@@ -4,7 +4,15 @@ class ArticlesController < ApplicationController
 
   def search
     # get the result
-    @result = Article.analyze_articles(permit_params)
+    redis_key = "search:#{permit_params[:search]}; start_time:#{permit_params[:start_time]}; end_time:#{permit_params[:end_time]}"
+    cache = $redis.get(redis_key)
+    if cache
+      @result = JSON.parse(cache)
+      binding.pry
+    else
+      @result = Article.analyze_articles(permit_params)
+      $redis.set(redis_key, @result.to_json)
+    end
     if current_user
       @result[:user] = {user_id: current_user.id}
       if @result
