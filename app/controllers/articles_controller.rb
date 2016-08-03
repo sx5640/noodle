@@ -3,15 +3,18 @@ class ArticlesController < ApplicationController
   end
 
   def search
-    # get the result
+    # check cache for the search params
     redis_key = "search:#{permit_params[:search]}; start_time:#{permit_params[:start_time]}; end_time:#{permit_params[:end_time]}"
     cache = $redis.get(redis_key)
     if cache
       @result = JSON.parse(cache)
-      binding.pry
+      # the line commented out below gives an option to renew the expiration time everytime it is searched
+      # $redis.expire(redis_key, 1.hour.to_i)
     else
+      # do a new search and save the result in cache, expires in 1 hour
       @result = Article.analyze_articles(permit_params)
       $redis.set(redis_key, @result.to_json)
+      $redis.expire(redis_key, 1.hour.to_i)
     end
     if current_user
       @result[:user] = {user_id: current_user.id}
